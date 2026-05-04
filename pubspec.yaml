@@ -1,0 +1,37 @@
+name: mssve
+description: MSSVE - Gestor de nutrición y entrenamiento físico multiplataforma.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.3.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  flutter_bloc: ^8.1.6
+  equatable: ^2.0.5
+  mysql_client: ^0.0.27
+  get_it: ^7.7.0
+  easy_localization: ^3.0.8
+  flutter_secure_storage: ^9.2.2
+  crypto: ^3.0.3
+  go_router: ^14.0.0
+  fl_chart: ^0.68.0
+  shimmer: ^3.0.0
+  cached_network_image: ^3.3.1
+  intl: ^0.20.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+  bloc_test: ^9.1.7
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/logo/
+    - assets/translations/

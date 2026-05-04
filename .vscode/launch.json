@@ -1,0 +1,26 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "MSSVE - Windows",
+      "request": "launch",
+      "type": "dart",
+      "deviceId": "windows",
+      "program": "lib/main.dart"
+    },
+    {
+      "name": "MSSVE - Android Emulador",
+      "request": "launch",
+      "type": "dart",
+      "deviceId": "emulator-5554",
+      "program": "lib/main.dart"
+    },
+    {
+      "name": "MSSVE - Android Físico",
+      "request": "launch",
+      "type": "dart",
+      "deviceId": "android",
+      "program": "lib/main.dart"
+    }
+  ]
+}
