@@ -2,7 +2,7 @@ import 'package:go_router/go_router.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:mssve/auth/auth_bloc.dart';
+import 'package:mssve/BLoC/auth/auth_bloc.dart';
 import 'package:mssve/service_locator.dart';
 import 'package:mssve/services/database_service.dart';
 import 'package:mssve/theme.dart';

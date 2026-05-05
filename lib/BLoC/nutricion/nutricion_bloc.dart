@@ -2,9 +2,9 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
-import '../../models/alimento.dart';
-import '../../models/registro_diario.dart';
-import '../../repositories/repository_nutricion.dart';
+import '../../../models/alimento.dart';
+import '../../../models/registro_diario.dart';
+import '../../../repositories/repository_nutricion.dart';
 
 part 'nutricion_event.dart';
 part 'nutricion_state.dart';

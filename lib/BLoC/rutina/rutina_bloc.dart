@@ -1,9 +1,9 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../models/ejercicio.dart';
-import '../../models/rutina.dart';
-import '../../repositories/repository_rutina.dart';
+import '../../../models/ejercicio.dart';
+import '../../../models/rutina.dart';
+import '../../../repositories/repository_rutina.dart';
 import 'package:mssve/models/rutina_ejercicio.dart';
 // Con `part` le digo a Dart que estos dos archivos forman parte de este mismo archivo
 // Los eventos y estados están separados en sus propios archivos pero pertenecen al mismo bloque

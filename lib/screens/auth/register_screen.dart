@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 // CORREGIDO: import duplicado eliminado, solo uno
-import 'package:mssve/auth/auth_bloc.dart';
+import 'package:mssve/BLoC/auth/auth_bloc.dart';
 import '../../utils/get_calculator.dart';
 import '../../widgets/custom_text_field.dart';
 import '../../widgets/primary_button.dart';

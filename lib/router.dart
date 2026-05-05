@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mssve/auth/auth_bloc.dart';
-import 'package:mssve/home/home_bloc.dart';
-import 'package:mssve/nutricion/nutricion_bloc.dart';
-import 'package:mssve/perfil/perfil_bloc.dart';
-import 'package:mssve/rutina/rutina_bloc.dart';
+import 'package:mssve/BLoC/auth/auth_bloc.dart';
+import 'package:mssve/BLoC/home/home_bloc.dart';
+import 'package:mssve/BLoC/nutricion/nutricion_bloc.dart';
+import 'package:mssve/BLoC/perfil/perfil_bloc.dart';
+import 'package:mssve/BLoC/rutina/rutina_bloc.dart';
 import 'package:mssve/sesion/sesion_bloc.dart';
 
 import 'screens/auth/login_screen.dart';

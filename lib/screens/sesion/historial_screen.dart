@@ -5,9 +5,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
-import 'package:mssve/auth/auth_bloc.dart';
+import 'package:mssve/BLoC/auth/auth_bloc.dart';
 import 'package:mssve/models/sesion_entrenamiento.dart';
-import 'package:mssve/rutina/rutina_bloc.dart';
+import 'package:mssve/BLoC/rutina/rutina_bloc.dart';
 import 'package:mssve/sesion/sesion_bloc.dart';
 import 'package:mssve/widgets/app_drawer.dart';
 

@@ -1,10 +1,10 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
  
-import '../../models/registro_diario.dart';
-import '../../models/rutina.dart';
-import '../../repositories/repository_nutricion.dart';
-import '../../repositories/repository_rutina.dart';
+import '../../../models/registro_diario.dart';
+import '../../../models/rutina.dart';
+import '../../../repositories/repository_nutricion.dart';
+import '../../../repositories/repository_rutina.dart';
  
 part 'home_event.dart';
 part 'home_state.dart';

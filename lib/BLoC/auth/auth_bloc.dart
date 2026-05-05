@@ -1,8 +1,8 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../models/usuario.dart';
-import '../repositories/repository_autenticacion.dart';
+import '../../models/usuario.dart';
+import '../../repositories/repository_autenticacion.dart';
 
 part 'auth_event.dart';
 part 'auth_state.dart';
