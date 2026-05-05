@@ -10,9 +10,9 @@ import 'package:mssve/sesion/sesion_bloc.dart';
 import 'package:mssve/services/crypto_helper.dart';
 import 'package:mssve/services/get_calculator.dart';
 
-// ════════════════════════════════════════════════════════════════════════════
+ 
 // REPOSITORIO FALSO — simula la BD sin conexión real
-// ════════════════════════════════════════════════════════════════════════════
+
 class _FakeRepo implements RepositorySesion {
   List<SesionEntrenamiento> historial = [];
   SesionEntrenamiento? sesionDelDia;
@@ -65,7 +65,7 @@ class _FakeRepo implements RepositorySesion {
       historial.removeWhere((s) => s.id == id);
 }
 
-// ── Datos de prueba compartidos ───────────────────────────────────────────
+//Datos de prueba compartidos 
 const _alimentoPollo = Alimento(
   id: 1,
   nombre: 'Pechuga de pollo',
@@ -112,7 +112,7 @@ Ejercicio _ejMultilingue() => Ejercicio(
       esPersonalizado: false,
     );
 
-// ── Validadores — replican la lógica de los formularios ──────────────────
+//Validadores replican la lógica de los formularios 
 String? _validarEmail(String? v) {
   if (v == null || v.trim().isEmpty) return 'Campo requerido';
   if (!v.contains('@')) return 'Email inválido';
@@ -135,10 +135,9 @@ String? _validarNumero(String? v) {
   return null;
 }
 
-// ════════════════════════════════════════════════════════════════════════════
 void main() {
 
-  // ── 7.1 PRUEBAS UNITARIAS ────────────────────────────────────────────────
+  //7.1 PRUEBAS UNITARIAS 
   group('7.1 Unitarias — Cifrado SHA-256', () {
     test('Hash tiene 64 caracteres hexadecimales', () {
       final hash = CryptoHelper.hashPassword('miPassword123');
@@ -240,7 +239,7 @@ void main() {
     });
   });
 
-  // ── 7.2 PRUEBAS DE INTEGRACIÓN ───────────────────────────────────────────
+  //7.2 PRUEBAS DE INTEGRACIÓN 
   group('7.2 Integración — CRUD completo de alimentos', () {
     late _FakeRepo repo;
     setUp(() => repo = _FakeRepo());
@@ -352,7 +351,7 @@ void main() {
     });
   });
 
-  // ── 7.3 PRUEBAS DE INTERFAZ ──────────────────────────────────────────────
+  //7.3 PRUEBAS DE INTERFAZ
   group('7.3 Interfaz — Validación de formularios', () {
     test('Email vacío no válido', () =>
         expect(_validarEmail(''), isNotNull));
@@ -390,7 +389,7 @@ void main() {
     });
   });
 
-  // ── 7.4 PRUEBAS DE REGRESIÓN ─────────────────────────────────────────────
+  //7.4 PRUEBAS DE REGRESIÓN
   group('7.4 Regresión', () {
     test('Eliminar ejercicio no borra la sesión', () async {
       final repo = _FakeRepo();

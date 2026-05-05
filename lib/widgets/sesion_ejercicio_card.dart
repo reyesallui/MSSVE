@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:mssve/models/rutina_ejercicio.dart';
 import 'package:mssve/models/sesion_ejercicio.dart';
 
+// Tarjeta de un ejercicio dentro de la sesión activa
 class SesionEjercicioCard extends StatefulWidget {
   final SesionEjercicio sesionEjercicio;
   final void Function(List<SerieDetalle>)? onGuardar;
@@ -33,6 +34,7 @@ class _SesionEjercicioCardState extends State<SesionEjercicioCard> {
     );
   }
 
+  // /BUILD/
   @override
   Widget build(BuildContext context) {
     final ejercicio  = widget.sesionEjercicio.ejercicio;
@@ -41,6 +43,7 @@ class _SesionEjercicioCardState extends State<SesionEjercicioCard> {
     final series     = widget.sesionEjercicio.seriesRealizadas;
     final tieneDatos = series.isNotEmpty;
 
+    //Solo se expande con ejercicio de fuerza que tengan datos.
     return GestureDetector(
       onTap: (!esCardio && tieneDatos)
           ? () => setState(() => _expandido = !_expandido)
@@ -58,6 +61,8 @@ class _SesionEjercicioCardState extends State<SesionEjercicioCard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+
+            // /CABECERA/
             Row(children: [
               Container(
                 width: 44, height: 44,
@@ -89,6 +94,7 @@ class _SesionEjercicioCardState extends State<SesionEjercicioCard> {
                   ],
                 ),
               ),
+                 // Solo se muestra la fecha si es un ejercicio de
               if (!esCardio && tieneDatos)
                 AnimatedRotation(
                   turns: _expandido ? 0.5 : 0,
@@ -117,6 +123,7 @@ class _SesionEjercicioCardState extends State<SesionEjercicioCard> {
                 ),
             ]),
 
+            // /RESUMEN/
             const SizedBox(height: 6),
             if (!tieneDatos)
               Text(
@@ -126,12 +133,14 @@ class _SesionEjercicioCardState extends State<SesionEjercicioCard> {
                 style: const TextStyle(color: Colors.grey, fontSize: 12),
               )
             else if (esCardio)
+              // cardio guarda los minutos en reps
               Text('${series.first.reps} min',
                   style: const TextStyle(color: Colors.grey, fontSize: 12))
             else
               Text(_resumenFuerza(series),
                   style: const TextStyle(color: Colors.grey, fontSize: 12)),
 
+            // /DETALLES/
             if (!esCardio && _expandido && tieneDatos) ...[
               const SizedBox(height: 10),
               const Divider(color: Color(0xFF333333), height: 1),
@@ -154,7 +163,8 @@ class _SesionEjercicioCardState extends State<SesionEjercicioCard> {
                     Text(
                       '${s.reps} reps'
                       '${s.peso != null ? ' · ${s.peso} kg' : ''}',
-                      style: const TextStyle(color: Colors.white, fontSize: 13),
+                      style: const TextStyle(
+                          color: Colors.white, fontSize: 13),
                     ),
                   ]),
                 );
@@ -166,6 +176,7 @@ class _SesionEjercicioCardState extends State<SesionEjercicioCard> {
     );
   }
 
+  // Agrupa reps y pesos distintos con / para el texto resumen
   String _resumenFuerza(List<SerieDetalle> series) {
     final n    = series.length;
     final reps = series.map((s) => s.reps).toSet();
@@ -183,8 +194,8 @@ class _SesionEjercicioCardState extends State<SesionEjercicioCard> {
   }
 }
 
-// ── Diálogo de edición ────────────────────────────────────────────────────────
-
+// /DIÁLOGO DE EDICIÓN/
+//Si es cardio se edita una serie que son los minutos, si es fuerza se edita las series enteras y comprobamos que no hay 0 reps
 class _EditarSeriesDialog extends StatefulWidget {
   final SesionEjercicio sesionEjercicio;
   final void Function(List<SerieDetalle>)? onGuardar;
@@ -210,12 +221,14 @@ class _EditarSeriesDialogState extends State<_EditarSeriesDialog> {
     final series = widget.sesionEjercicio.seriesRealizadas;
 
     if (_esCardio) {
+      // cardio: reps guarda los minutos
       final minutos = series.isNotEmpty ? series.first.reps : 0;
       _minCtrl = TextEditingController(
           text: minutos > 0 ? minutos.toString() : '');
       _ctrls = [];
     } else {
       _minCtrl = TextEditingController();
+      // Si no hay series guardadas empezamos con una fila vacía
       final fuente =
           series.isNotEmpty ? series : [const SerieDetalle(reps: 0)];
       _ctrls = fuente
@@ -234,6 +247,7 @@ class _EditarSeriesDialogState extends State<_EditarSeriesDialog> {
     super.dispose();
   }
 
+  // Avisa si alguna serie tiene 0 reps antes de guardar
   void _mostrarErrorReps() {
     showDialog(
       context: context,
@@ -257,7 +271,9 @@ class _EditarSeriesDialogState extends State<_EditarSeriesDialog> {
     );
   }
 
+  // /GUARDAR/
   void _guardar() {
+    //no pueden haber series con 0 repes
     if (!_esCardio) {
       final tieneRepsCero = _ctrls.any((c) {
         final val = int.tryParse(c.repsCtr.text.trim());
@@ -287,6 +303,7 @@ class _EditarSeriesDialogState extends State<_EditarSeriesDialog> {
     Navigator.pop(context);
   }
 
+  // /BUILD DIÁLOGO/
   @override
   Widget build(BuildContext context) {
     final nombre = widget.sesionEjercicio.ejercicio
@@ -313,6 +330,8 @@ class _EditarSeriesDialogState extends State<_EditarSeriesDialog> {
       content: SizedBox(
         width: double.maxFinite,
         child: _esCardio
+
+            // /CARDIO/
             ? TextField(
                 controller: _minCtrl,
                 keyboardType: TextInputType.number,
@@ -329,6 +348,8 @@ class _EditarSeriesDialogState extends State<_EditarSeriesDialog> {
                       borderSide: BorderSide.none),
                 ),
               )
+
+            // /FUERZA/
             : SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -369,6 +390,7 @@ class _EditarSeriesDialogState extends State<_EditarSeriesDialog> {
                           const SizedBox(width: 8),
                           Expanded(child: _Campo(ctrl: c.pesoCtr, hint: 'kg')),
                           const SizedBox(width: 4),
+                          // Mínimo 1 serie — botón quitar solo si hay más de una
                           if (_ctrls.length > 1)
                             GestureDetector(
                               onTap: () => setState(() {
@@ -413,8 +435,9 @@ class _EditarSeriesDialogState extends State<_EditarSeriesDialog> {
   }
 }
 
-// ── Widgets auxiliares ────────────────────────────────────────────────────────
+// /WIDGETS AUXILIARES/
 
+// Campo numérico compacto reutilizado en reps y peso
 class _Campo extends StatelessWidget {
   final TextEditingController ctrl;
   final String hint;
@@ -444,6 +467,7 @@ class _Campo extends StatelessWidget {
   }
 }
 
+// Agrupa los controladores de una fila de serie
 class _SerieCtrl {
   final TextEditingController repsCtr;
   final TextEditingController pesoCtr;

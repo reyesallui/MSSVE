@@ -6,20 +6,18 @@ import 'package:mysql_client/mysql_client.dart';
 class DatabaseService {
   MySQLConnection? _connection;
 
-  // ── NUBE (Railway) — descomentar cuando tengas plan activo ──
+  //  NUBE 
   // static const String _host     = 'autorack.proxy.rlwy.net';
   // static const int    _port     = 44534;
   // static const String _password = 'ptXcSGxBuJkZKNgKwBKVgMtkSJJyLYTK';
   // static const bool   _secure   = true;
-  // ────────────────────────────────────────────────────────────
 
-  // ── LOCAL ────────────────────────────────────────────────────
+  //LOCAL 
   // En Android el emulador usa 10.0.2.2 para referirse al PC host
   static String get _host =>
       defaultTargetPlatform == TargetPlatform.android ? '10.0.2.2' : 'localhost';
   static const int    _port     = 3306;
   static const bool   _secure   = true;
-  // ────────────────────────────────────────────────────────────
 
   static const String _user     = 'root';
   static const String _password = '1234';

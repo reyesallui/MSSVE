@@ -300,7 +300,7 @@ class _EditarDetalleDialogState extends State<_EditarDetalleDialog> {
 
   void _guardar() {
     // Convertimos los textos de los campos a los tipos correctos (int, double)
-    // int.tryParse devuelve null si el texto no es un número, por eso usamos ?? 0
+    // int.tryParse devuelve null si el texto no es un número, por eso usamos ??
     final nuevasSeries = _ctrls.map((c) {
       return SerieDetalle(
         reps: int.tryParse(c.repsCtr.text) ?? 0,
@@ -366,7 +366,7 @@ class _EditarDetalleDialogState extends State<_EditarDetalleDialog> {
               ...List.generate(_ctrls.length, (i) {
                 final ctrl = _ctrls[i];
                 // StatefulBuilder nos permite hacer setState solo en esta fila
-                // sin reconstruir todo el diálogo. Útil para el checkbox de dropset.
+                // sin reconstruir todo el diálogo por lo que lo usamos para las casillas de dropset
                 return StatefulBuilder(
                   builder: (context, setRow) => Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -482,8 +482,7 @@ class _EditarDetalleDialogState extends State<_EditarDetalleDialog> {
 }
 
 
-// Campo de texto compacto y reutilizable para el diálogo de edición.
-// Solo acepta números y tiene un estilo oscuro para encajar con el tema.
+// Campo de texto
 class _CampoEdicion extends StatelessWidget {
   final TextEditingController ctrl;
   final String hint;

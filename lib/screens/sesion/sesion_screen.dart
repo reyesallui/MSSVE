@@ -11,6 +11,7 @@ import 'package:mssve/models/ejercicio.dart';
 import 'package:mssve/models/rutina_ejercicio.dart';
 import 'package:mssve/widgets/sesion_ejercicio_card.dart';
 
+// Pantalla de sesión activa — muestra los ejercicios y permite modificar, añadir y eliminar
 class SesionScreen extends StatefulWidget {
   const SesionScreen({super.key});
 
@@ -26,6 +27,7 @@ class _SesionScreenState extends State<SesionScreen> {
     setState(() {});
   }
 
+  //  BUILD 
   @override
   Widget build(BuildContext context) {
     final _ = context.locale;
@@ -54,6 +56,9 @@ class _SesionScreenState extends State<SesionScreen> {
         ],
       ),
 
+      //  FAB 
+      // Capturamos los blocs antes de abrir el sheet porque el context
+      // puede quedar invalidado al cerrarlo
       floatingActionButton: BlocBuilder<SesionBloc, SesionState>(
         buildWhen: (prev, curr) => true,
         builder: (context, state) {
@@ -86,6 +91,9 @@ class _SesionScreenState extends State<SesionScreen> {
         },
       ),
 
+      //  BODY 
+      // buildWhen: true fuerza rebuild siempre — Equatable puede considerar
+      // estados iguales aunque los ejercicios hayan cambiado
       body: BlocBuilder<SesionBloc, SesionState>(
         buildWhen: (prev, curr) => true,
         builder: (context, state) {
@@ -102,12 +110,14 @@ class _SesionScreenState extends State<SesionScreen> {
             final sesion = state.sesionActiva!;
             return Column(children: [
 
+              //  Cabecera 
               Container(
                 padding: const EdgeInsets.all(16),
                 color: const Color(0xFF0F0F0F),
                 child: Row(children: [
                   IconButton(
                     icon: const Icon(Icons.arrow_back, color: Colors.white),
+                    // Recarga el historial antes de salir para reflejar cambios
                     onPressed: () {
                       context
                           .read<SesionBloc>()
@@ -137,6 +147,7 @@ class _SesionScreenState extends State<SesionScreen> {
                 ]),
               ),
 
+              //  Lista de ejercicios 
               Expanded(
                 child: sesion.ejercicios.isEmpty
                     ? Center(
@@ -172,8 +183,8 @@ class _SesionScreenState extends State<SesionScreen> {
   }
 }
 
-//  Sheet añadir ejercicio 
-
+// Sheet añadir ejercicio 
+// Dos pasos: buscador de ejercicios = formulario de series/reps/peso
 class _AddEjercicioSesionSheet extends StatefulWidget {
   final void Function(int idEjercicio, List<SerieDetalle> series) onAnadir;
   final int idUsuario;
@@ -196,6 +207,7 @@ class _AddEjercicioSesionSheetState
   void initState() {
     super.initState();
     _series = List.generate(3, (_) => _SerieCtrlSesion());
+    // Búsqueda vacía para mostrar todos los ejercicios al abrir
     context.read<RutinaBloc>().add(RutinaBuscarEjerciciosEvent(
       search: '',
       idUsuario: widget.idUsuario,
@@ -210,49 +222,29 @@ class _AddEjercicioSesionSheetState
     super.dispose();
   }
 
+  //Confirmar 
+  
   void _confirmar() {
     if (_ejercicioSeleccionado == null) return;
 
     List<SerieDetalle> series = [];
-
     if (_ejercicioSeleccionado!.esCardio) {
-      final minutos = int.tryParse(_duracionCtrl.text.trim()) ?? 0;
+      final minutos = int.tryParse(_duracionCtrl.text) ?? 0;
       if (minutos > 0) series = [SerieDetalle(reps: minutos)];
     } else {
-      final tieneRepsCero = _series.any((s) {
-        final val = int.tryParse(s.repsCtr.text.trim());
-        return val == null || val <= 0;
-      });
-      if (tieneRepsCero) {
-        showDialog(
-          context: context,
-          builder: (ctx) => AlertDialog(
-            backgroundColor: const Color(0xFF1A1A1A),
-            content: Text(
-              'sesion.min_one_rep'.tr(),
-              style: const TextStyle(color: Colors.white),
-              textAlign: TextAlign.center,
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(ctx),
-                child: Text(
-                  'common.cancel'.tr(),
-                  style: const TextStyle(color: Color(0xFFD32F2F)),
-                ),
-              ),
-            ],
-          ),
+      series = _series.map((s) {
+        final dropsets = s.dropsetActivo
+            ? s.dropsetCtrls
+                .map((c) => double.tryParse(c.text) ?? 0.0)
+                .toList()
+            : <double>[];
+        return SerieDetalle(
+          reps: int.tryParse(s.repsCtr.text) ?? 0,
+          peso: double.tryParse(s.pesoCtr.text),
+          dropset: s.dropsetActivo,
+          dropsets: dropsets,
         );
-        return;
-      }
-
-      series = _series
-          .map((s) => SerieDetalle(
-                reps: int.tryParse(s.repsCtr.text.trim()) ?? 0,
-                peso: double.tryParse(s.pesoCtr.text),
-              ))
-          .toList();
+      }).toList();
     }
 
     widget.onAnadir(_ejercicioSeleccionado!.id, series);
@@ -281,6 +273,7 @@ class _AddEjercicioSesionSheetState
           )),
           const SizedBox(height: 16),
 
+          //Paso 1: Buscador 
           if (_ejercicioSeleccionado == null) ...[
             Text('sesion.add_exercise'.tr(),
                 style: const TextStyle(color: Colors.white,
@@ -352,6 +345,7 @@ class _AddEjercicioSesionSheetState
               ),
             ),
 
+          //Paso 2: Formulario
           ] else ...[
             Row(children: [
               Expanded(
@@ -379,7 +373,8 @@ class _AddEjercicioSesionSheetState
             ]),
             const SizedBox(height: 16),
 
-            if (_ejercicioSeleccionado!.esCardio)
+              //si es cardio = duracion, si es fuerza = series/reps/peso
+              if (_ejercicioSeleccionado!.esCardio)
               TextField(
                 controller: _duracionCtrl,
                 keyboardType: TextInputType.number,
@@ -396,7 +391,7 @@ class _AddEjercicioSesionSheetState
               )
             else ...[
               Padding(
-                padding: const EdgeInsets.only(left: 32, bottom: 4),
+                padding: const EdgeInsets.only(left: 40, bottom: 4),
                 child: Row(children: [
                   Expanded(child: Text('rutina.reps'.tr(),
                       style: const TextStyle(color: Colors.grey, fontSize: 12),
@@ -405,44 +400,28 @@ class _AddEjercicioSesionSheetState
                   Expanded(child: Text('rutina.weight_kg'.tr(),
                       style: const TextStyle(color: Colors.grey, fontSize: 12),
                       textAlign: TextAlign.center)),
-                  const SizedBox(width: 48),
+                  const SizedBox(width: 8),
+                  const Text('Drop',
+                      style: TextStyle(color: Colors.grey, fontSize: 12)),
+                  const SizedBox(width: 32),
                 ]),
               ),
               Expanded(
                 child: SingleChildScrollView(
                   child: Column(
-                    children: List.generate(_series.length, (i) {
-                      final s = _series[i];
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 8),
-                        child: Row(children: [
-                          SizedBox(
-                            width: 24,
-                            child: Text('${i + 1}',
-                                style: const TextStyle(
-                                    color: Color(0xFFD32F2F),
-                                    fontWeight: FontWeight.bold),
-                                textAlign: TextAlign.center),
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(child: _CampoSesion(ctrl: s.repsCtr, hint: '10')),
-                          const SizedBox(width: 8),
-                          Expanded(child: _CampoSesion(ctrl: s.pesoCtr, hint: 'kg')),
-                          const SizedBox(width: 8),
-                          if (_series.length > 1)
-                            GestureDetector(
-                              onTap: () => setState(() {
-                                s.dispose();
+                    children: List.generate(_series.length, (i) =>
+                      _SerieRowSesion(
+                        numero: i + 1,
+                        ctrl: _series[i],
+                        onRemove: _series.length > 1
+                            ? () => setState(() {
+                                _series[i].dispose();
                                 _series.removeAt(i);
-                              }),
-                              child: const Icon(Icons.close,
-                                  color: Colors.grey, size: 16),
-                            )
-                          else
-                            const SizedBox(width: 16),
-                        ]),
-                      );
-                    }),
+                              })
+                            : null,
+                        onChanged: () => setState(() {}),
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -479,8 +458,150 @@ class _AddEjercicioSesionSheetState
   }
 }
 
-//  Widgets auxiliares 
+//Fila de serie con dropsets
+// Igual que _SerieRow en rutinas pero en el contexto de sesión
+class _SerieRowSesion extends StatelessWidget {
+  final int numero;
+  final _SerieCtrlSesion ctrl;
+  final VoidCallback? onRemove;
+  final VoidCallback onChanged;
 
+  const _SerieRowSesion({
+    required this.numero,
+    required this.ctrl,
+    required this.onRemove,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(children: [
+          SizedBox(
+            width: 28,
+            child: Text('$numero',
+                style: const TextStyle(
+                    color: Color(0xFFD32F2F), fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center),
+          ),
+          const SizedBox(width: 4),
+          Expanded(
+            child: TextField(
+              controller: ctrl.repsCtr,
+              keyboardType: TextInputType.number,
+              style: const TextStyle(color: Colors.white, fontSize: 14),
+              textAlign: TextAlign.center,
+              decoration: _inputDeco('10'),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: TextField(
+              controller: ctrl.pesoCtr,
+              keyboardType: TextInputType.number,
+              style: const TextStyle(color: Colors.white, fontSize: 14),
+              textAlign: TextAlign.center,
+              decoration: _inputDeco('kg'),
+            ),
+          ),
+          const SizedBox(width: 8),
+          SizedBox(
+            width: 32,
+            child: Checkbox(
+              value: ctrl.dropsetActivo,
+              activeColor: const Color(0xFFD32F2F),
+              side: const BorderSide(color: Colors.grey),
+              onChanged: (v) {
+                ctrl.dropsetActivo = v ?? false;
+                if (!ctrl.dropsetActivo) ctrl.dropsetCtrls.clear();
+                onChanged();
+              },
+            ),
+          ),
+          SizedBox(
+            width: 24,
+            child: onRemove != null
+                ? GestureDetector(
+                    onTap: onRemove,
+                    child: const Icon(Icons.close,
+                        color: Colors.grey, size: 16),
+                  )
+                : const SizedBox(),
+          ),
+        ]),
+
+        //Dropsets
+        if (ctrl.dropsetActivo) ...[
+          Padding(
+            padding: const EdgeInsets.only(left: 32, top: 6, bottom: 4),
+            child: Row(children: [
+              const Icon(Icons.arrow_downward,
+                  color: Color(0xFFD32F2F), size: 14),
+              const SizedBox(width: 4),
+              const Text('Dropsets',
+                  style: TextStyle(color: Color(0xFFD32F2F), fontSize: 12)),
+              const Spacer(),
+              GestureDetector(
+                onTap: () {
+                  ctrl.dropsetCtrls.add(TextEditingController());
+                  onChanged();
+                },
+                child: const Icon(Icons.add_circle_outline,
+                    color: Color(0xFFD32F2F), size: 18),
+              ),
+            ]),
+          ),
+          ...List.generate(ctrl.dropsetCtrls.length, (di) => Padding(
+            padding: const EdgeInsets.only(left: 32, bottom: 4),
+            child: Row(children: [
+              Text('Drop ${di + 1}',
+                  style: const TextStyle(color: Colors.grey, fontSize: 12)),
+              const SizedBox(width: 8),
+              SizedBox(
+                width: 80,
+                child: TextField(
+                  controller: ctrl.dropsetCtrls[di],
+                  keyboardType: TextInputType.number,
+                  style: const TextStyle(color: Colors.white, fontSize: 13),
+                  textAlign: TextAlign.center,
+                  decoration: _inputDeco('kg'),
+                ),
+              ),
+              const SizedBox(width: 8),
+              GestureDetector(
+                onTap: () {
+                  ctrl.dropsetCtrls[di].dispose();
+                  ctrl.dropsetCtrls.removeAt(di);
+                  onChanged();
+                },
+                child: const Icon(Icons.close, color: Colors.grey, size: 14),
+              ),
+            ]),
+          )),
+        ],
+
+        const Divider(color: Color(0xFF222222), height: 12),
+      ],
+    );
+  }
+
+  InputDecoration _inputDeco(String hint) => InputDecoration(
+    hintText: hint,
+    hintStyle: const TextStyle(color: Color(0xFF555555), fontSize: 13),
+    isDense: true,
+    contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+    filled: true,
+    fillColor: const Color(0xFF0A0A0A),
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(6),
+      borderSide: BorderSide.none,
+    ),
+  );
+}
+
+//Campo de texto compacto
 class _CampoSesion extends StatelessWidget {
   final TextEditingController ctrl;
   final String hint;
@@ -509,12 +630,16 @@ class _CampoSesion extends StatelessWidget {
   }
 }
 
+//Controladores de serie 
 class _SerieCtrlSesion {
   final repsCtr = TextEditingController(text: '10');
   final pesoCtr = TextEditingController();
+  bool dropsetActivo = false;
+  List<TextEditingController> dropsetCtrls = [];
 
   void dispose() {
     repsCtr.dispose();
     pesoCtr.dispose();
+    for (final c in dropsetCtrls) c.dispose();
   }
 }
