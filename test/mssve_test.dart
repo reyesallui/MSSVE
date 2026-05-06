@@ -88,7 +88,7 @@ SesionEntrenamiento _sesionFake({
       ejercicios: ejercicios ?? [],
     );
 
-SesionEjercicio _ejercicioFake() => SesionEjercicio(
+SesionEjercicio _ejercicioFake() => const SesionEjercicio(
       id: 10,
       idSesion: 1,
       idEjercicio: 5,
@@ -100,10 +100,10 @@ SesionEjercicio _ejercicioFake() => SesionEjercicio(
         esCardio: false,
         esPersonalizado: false,
       ),
-      seriesRealizadas: [const SerieDetalle(reps: 10, peso: 80.0)],
+      seriesRealizadas: [SerieDetalle(reps: 10, peso: 80.0)],
     );
 
-Ejercicio _ejMultilingue() => Ejercicio(
+Ejercicio _ejMultilingue() => const Ejercicio(
       id: 1,
       nombreEs: 'Press banca',
       nombreEn: 'Bench press',
@@ -310,7 +310,7 @@ void main() {
 
     test('Cargar historial emite SesionLoaded', () async {
       repo.historial = [_sesionFake(id: 1), _sesionFake(id: 2)];
-      bloc.add(SesionCargarHistorialEvent(1));
+      bloc.add(const SesionCargarHistorialEvent(1));
       await Future.delayed(const Duration(milliseconds: 100));
       expect(bloc.state, isA<SesionLoaded>());
       expect((bloc.state as SesionLoaded).historial.length, equals(2));
@@ -319,7 +319,7 @@ void main() {
     test('Crear sesión nueva actualiza historial', () async {
       repo.sesionDelDia = null;
       repo.sesionCreada = _sesionFake();
-      bloc.add(SesionCrearEvent(
+      bloc.add(const SesionCrearEvent(
           idRutina: 1, idUsuario: 1, ejerciciosPlantilla: []));
       await Future.delayed(const Duration(milliseconds: 100));
       expect((bloc.state as SesionLoaded).sesionActiva?.id, equals(1));
@@ -328,13 +328,13 @@ void main() {
     test('Añadir ejercicio actualiza la sesión activa', () async {
       repo.historial = [_sesionFake()];
       repo.sesionActualizada = _sesionFake(ejercicios: [_ejercicioFake()]);
-      bloc.add(SesionCargarHistorialEvent(1));
+      bloc.add(const SesionCargarHistorialEvent(1));
       await Future.delayed(const Duration(milliseconds: 100));
       bloc.add(SesionSeleccionarEvent(_sesionFake()));
       await Future.delayed(const Duration(milliseconds: 100));
-      bloc.add(SesionAnadirEjercicioEvent(
+      bloc.add(const SesionAnadirEjercicioEvent(
           idEjercicio: 5,
-          seriesRealizadas: [const SerieDetalle(reps: 10, peso: 80.0)]));
+          seriesRealizadas: [SerieDetalle(reps: 10, peso: 80.0)]));
       await Future.delayed(const Duration(milliseconds: 100));
       expect(
           (bloc.state as SesionLoaded).sesionActiva?.ejercicios.length,
@@ -343,9 +343,9 @@ void main() {
 
     test('Eliminar sesión la quita del historial', () async {
       repo.historial = [_sesionFake(id: 1)];
-      bloc.add(SesionCargarHistorialEvent(1));
+      bloc.add(const SesionCargarHistorialEvent(1));
       await Future.delayed(const Duration(milliseconds: 100));
-      bloc.add(SesionEliminarEvent(id: 1));
+      bloc.add(const SesionEliminarEvent(id: 1));
       await Future.delayed(const Duration(milliseconds: 100));
       expect((bloc.state as SesionLoaded).historial, isEmpty);
     });
@@ -397,11 +397,11 @@ void main() {
       final sesion = _sesionFake(ejercicios: [_ejercicioFake()]);
       repo.historial = [sesion];
       repo.sesionActualizada = _sesionFake(ejercicios: []);
-      bloc.add(SesionCargarHistorialEvent(1));
+      bloc.add(const SesionCargarHistorialEvent(1));
       await Future.delayed(const Duration(milliseconds: 100));
       bloc.add(SesionSeleccionarEvent(sesion));
       await Future.delayed(const Duration(milliseconds: 100));
-      bloc.add(SesionEliminarEjercicioEvent(id: 10));
+      bloc.add(const SesionEliminarEjercicioEvent(id: 10));
       await Future.delayed(const Duration(milliseconds: 100));
       expect((bloc.state as SesionLoaded).sesionActiva, isNotNull);
       expect((bloc.state as SesionLoaded).sesionActiva?.ejercicios, isEmpty);
@@ -459,9 +459,9 @@ void main() {
       final sesionExistente = _sesionFake();
       repo.historial = [sesionExistente];
       repo.sesionDelDia = sesionExistente;
-      bloc.add(SesionCargarHistorialEvent(1));
+      bloc.add(const SesionCargarHistorialEvent(1));
       await Future.delayed(const Duration(milliseconds: 100));
-      bloc.add(SesionCrearEvent(
+      bloc.add(const SesionCrearEvent(
           idRutina: 1, idUsuario: 1, ejerciciosPlantilla: []));
       await Future.delayed(const Duration(milliseconds: 100));
       expect((bloc.state as SesionLoaded).historial.length, equals(1));

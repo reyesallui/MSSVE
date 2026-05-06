@@ -135,7 +135,7 @@ class _RutinaScreenState extends State<RutinaScreen> {
                 const Spacer(),
                 Switch(
                   value: esCardio,
-                  activeColor: const Color(0xFFD32F2F),
+                  activeThumbColor: const Color(0xFFD32F2F),
                   onChanged: (v) => setStateDialog(() => esCardio = v),
                 ),
               ]),
@@ -143,7 +143,7 @@ class _RutinaScreenState extends State<RutinaScreen> {
               if (!esCardio) ...[
                 const SizedBox(height: 8),
                 DropdownButtonFormField<String>(
-                  value: grupoMuscular,
+                  initialValue: grupoMuscular,
                   hint: Text('rutina.muscle_group'.tr(),
                       style: const TextStyle(color: Colors.grey)),
                   dropdownColor: const Color(0xFF1A1A1A),
@@ -391,14 +391,14 @@ class _DetalleRutina extends StatelessWidget {
                 const Spacer(),
                 Switch(
                   value: esCardio,
-                  activeColor: const Color(0xFFD32F2F),
+                  activeThumbColor: const Color(0xFFD32F2F),
                   onChanged: (v) => setStateDialog(() => esCardio = v),
                 ),
               ]),
               if (!esCardio) ...[
                 const SizedBox(height: 8),
                 DropdownButtonFormField<String>(
-                  value: grupoMuscular,
+                  initialValue: grupoMuscular,
                   hint: Text('rutina.muscle_group'.tr(),
                       style: const TextStyle(color: Colors.grey)),
                   dropdownColor: const Color(0xFF1A1A1A),

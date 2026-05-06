@@ -243,7 +243,9 @@ class _EditarSeriesDialogState extends State<_EditarSeriesDialog> {
   @override
   void dispose() {
     _minCtrl.dispose();
-    for (final c in _ctrls) c.dispose();
+    for (final c in _ctrls) {
+      c.dispose();
+    }
     super.dispose();
   }
 

@@ -230,13 +230,13 @@ class _ExerciseCardState extends State<ExerciseCard> {
     if (reps.length == 1) {
       partes.add('${reps.first} reps');
     } else {
-      partes.add(detalle.map((s) => '${s.reps}').join('/') + ' reps');
+      partes.add('${detalle.map((s) => '${s.reps}').join('/')} reps');
     }
     if (pesos.isNotEmpty) {
       if (pesos.length == 1) {
         partes.add('${pesos.first} kg');
       } else {
-        partes.add(detalle.where((s) => s.peso != null).map((s) => '${s.peso}').join('/') + ' kg');
+        partes.add('${detalle.where((s) => s.peso != null).map((s) => '${s.peso}').join('/')} kg');
       }
     }
     return partes.join(' · ');
@@ -247,12 +247,15 @@ class _ExerciseCardState extends State<ExerciseCard> {
   String _labelFuerza() {
     final partes = <String>[];
     //Cambiar el texto para traducirlo
-    if (widget.rutinaEjercicio.series != null)
+    if (widget.rutinaEjercicio.series != null) {
       partes.add('${widget.rutinaEjercicio.series} series');
-    if (widget.rutinaEjercicio.repeticiones != null)
+    }
+    if (widget.rutinaEjercicio.repeticiones != null) {
       partes.add('${widget.rutinaEjercicio.repeticiones} reps');
-    if (widget.rutinaEjercicio.pesoKg != null)
+    }
+    if (widget.rutinaEjercicio.pesoKg != null) {
       partes.add('${widget.rutinaEjercicio.pesoKg} kg');
+    }
     return partes.isEmpty ? '' : partes.join(' · ');
   }
 }
@@ -294,7 +297,9 @@ class _EditarDetalleDialogState extends State<_EditarDetalleDialog> {
   @override
   void dispose() {
     // Importante: liberar todos los TextEditingController para evitar memory leaks
-    for (final c in _ctrls) c.dispose();
+    for (final c in _ctrls) {
+      c.dispose();
+    }
     super.dispose();
   }
 
@@ -397,7 +402,9 @@ class _EditarDetalleDialogState extends State<_EditarDetalleDialog> {
                                 ctrl.dropset = v ?? false;
                                 // Si desmarcamos, limpiamos y liberamos los controladores de dropsets
                                 if (!ctrl.dropset) {
-                                  for (final d in ctrl.dropsetCtrls) d.dispose();
+                                  for (final d in ctrl.dropsetCtrls) {
+                                    d.dispose();
+                                  }
                                   ctrl.dropsetCtrls.clear();
                                 }
                               });
@@ -535,6 +542,8 @@ class _SerieEditCtrl {
   void dispose() {
     repsCtr.dispose();
     pesoCtr.dispose();
-    for (final d in dropsetCtrls) d.dispose();
+    for (final d in dropsetCtrls) {
+      d.dispose();
+    }
   }
 }

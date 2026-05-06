@@ -72,7 +72,7 @@ class _AddExerciseBottomSheetState extends State<AddExerciseBottomSheet> {
         idEjercicio: _ejercicioSeleccionado!.id,
         idUsuario: widget.idUsuario,
         duracionMinutos: int.tryParse(_duracionCtrl.text),
-        seriesDetalle: [],
+        seriesDetalle: const [],
       ));
     } else {
       final detalle = _series.map((s) {
@@ -427,6 +427,8 @@ class _SerieController {
   void dispose() {
     repsCtr.dispose();
     pesoCtr.dispose();
-    for (final c in dropsetCtrls) c.dispose();
+    for (final c in dropsetCtrls) {
+      c.dispose();
+    }
   }
 }

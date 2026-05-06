@@ -36,7 +36,9 @@ class RepositoryAutenticacion {
       return usuario;
     } catch (e) {
       if (e.toString().contains('login.') ||
-          e.toString().contains('error.')) rethrow;
+          e.toString().contains('error.')) {
+        rethrow;
+      }
       throw Exception('error.unknown');
     }
   }
@@ -82,7 +84,9 @@ class RepositoryAutenticacion {
       return usuario;
     } catch (e) {
       if (e.toString().contains('register.') ||
-          e.toString().contains('error.')) rethrow;
+          e.toString().contains('error.')) {
+        rethrow;
+      }
       throw Exception('error.unknown');
     }
   }

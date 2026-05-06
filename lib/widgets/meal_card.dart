@@ -61,7 +61,7 @@ class MealCard extends StatelessWidget {
                 contentPadding: EdgeInsets.zero,
                 dense: true,
                 title: Text(
-                  ca.alimento?.nombre ?? '',
+                  ca.alimento.nombre ?? '',
                   style: const TextStyle(color: Colors.white, fontSize: 14),
                 ),
                 subtitle: Text(
@@ -72,7 +72,7 @@ class MealCard extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      '${ca.kcalCalculadas?.toStringAsFixed(0)} kcal',
+                      '${ca.kcalCalculadas.toStringAsFixed(0)} kcal',
                       style: const TextStyle(
                         color: Colors.grey,
                         fontSize: 12,

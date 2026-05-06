@@ -267,7 +267,7 @@ class _Selector extends StatelessWidget {
         Text(label, style: const TextStyle(color: Colors.grey, fontSize: 13)),
         const SizedBox(height: 8),
         DropdownButtonFormField<String>(
-          value: value,
+          initialValue: value,
           dropdownColor: const Color(0xFF1A1A1A),
           style: const TextStyle(color: Colors.white),
           decoration: InputDecoration(

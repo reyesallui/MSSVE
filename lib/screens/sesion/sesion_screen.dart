@@ -218,7 +218,9 @@ class _AddEjercicioSesionSheetState
   void dispose() {
     _searchCtrl.dispose();
     _duracionCtrl.dispose();
-    for (final s in _series) s.dispose();
+    for (final s in _series) {
+      s.dispose();
+    }
     super.dispose();
   }
 
@@ -640,6 +642,8 @@ class _SerieCtrlSesion {
   void dispose() {
     repsCtr.dispose();
     pesoCtr.dispose();
-    for (final c in dropsetCtrls) c.dispose();
+    for (final c in dropsetCtrls) {
+      c.dispose();
+    }
   }
 }

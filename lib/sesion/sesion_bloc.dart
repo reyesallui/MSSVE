@@ -50,7 +50,7 @@ class SesionBloc extends Bloc<SesionEvent, SesionState> {
   ) async {
     final loaded = state is SesionLoaded
         ? state as SesionLoaded
-        : SesionLoaded(historial: []);
+        : SesionLoaded(historial: const []);
 
     final fecha =
         event.fecha ?? DateFormat('yyyy-MM-dd').format(DateTime.now());

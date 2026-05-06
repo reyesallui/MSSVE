@@ -89,7 +89,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 children: [
                   // Logo de la app — si no existe el archivo muestra el nombre
                   Image.asset(
-                    'assets/logo/logo.jpeg',
+                    'assets/logo/logo.png',
                     height: 300,
                     errorBuilder: (_, __, ___) => const Text(
                       'MSSVE',

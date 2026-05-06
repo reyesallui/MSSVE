@@ -16,9 +16,9 @@ class RepositoryPerfil {
   })  : _db = db,
         _storageService = storageService;
 
+  // *** Obtener usuario ***
   Future<Usuario> getUsuario(int id) async {
     try {
-    
       final results = await _db.query(
         '''SELECT id, nombre, apellidos, email, peso, altura,
            genero, objetivo, nivel_actividad,
@@ -30,7 +30,7 @@ class RepositoryPerfil {
       if (results.isEmpty) throw Exception('error.unknown');
 
       final usuario = Usuario.fromJson(Map<String, dynamic>.from(results.first));
-      // Sincronizamos la caché local con los datos frescos de la BD
+      // Sincronizamos caché local con datos frescos de BD
       await _storageService.saveUserJson(jsonEncode(usuario.toJson()));
       return usuario;
     } catch (e) {
@@ -39,8 +39,9 @@ class RepositoryPerfil {
     }
   }
 
-  // Al actualizar recalculamos el GET con Mifflin-St Jeor porque puede haber
-  // cambiado el peso, altura, edad o nivel de actividad física
+  // *** Actualizar perfil ***
+  // Recalculamos GET con Mifflin-St Jeor incluyendo el objetivo
+  // porque puede haber cambiado peso, altura, edad, actividad u objetivo
   Future<Usuario> actualizarPerfil({
     required int id,
     required String nombre,
@@ -60,7 +61,9 @@ class RepositoryPerfil {
         edad: edad,
         genero: genero,
         nivelActividad: nivelActividad,
+        objetivo: objetivo,
       );
+
       await _db.query(
         '''UPDATE usuarios SET
            nombre = ?, apellidos = ?, email = ?, peso = ?, altura = ?,
@@ -78,6 +81,8 @@ class RepositoryPerfil {
     }
   }
 
+  // *** Cambiar contraseña ***
+  // Nunca comparamos contraseñas en texto plano — siempre hasheamos primero
   Future<void> cambiarPassword({
     required int userId,
     required String currentPassword,
@@ -91,9 +96,7 @@ class RepositoryPerfil {
 
       if (results.isEmpty) throw Exception('error.unknown');
 
-      // Hasheamos la contraseña introducida y comparamos con la de la BD.
-      // Nunca guardamos ni comparamos contraseñas en texto plano
-      final storedHash = results.first['password_hash'] as String;
+      final storedHash  = results.first['password_hash'] as String;
       final currentHash = CryptoHelper.hashPassword(currentPassword);
 
       if (storedHash != currentHash) {

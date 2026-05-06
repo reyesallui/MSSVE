@@ -87,7 +87,7 @@ class RepositoryRutina {
       );
       return Rutina.fromJson({
         ...Map<String, dynamic>.from(results.first),
-        'ejercicios': [],
+        'ejercicios': const [],
       });
     } catch (e) {
       throw Exception('error.unknown');
