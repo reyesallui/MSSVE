@@ -56,6 +56,7 @@ Future<void> setupServiceLocator() async {
     () => HomeBloc(
       repositoryNutricion: sl<RepositoryNutricion>(),
       repositoryRutina: sl<RepositoryRutina>(),
+      repositoryPerfil: sl<RepositoryPerfil>(),
     ),
   );
 
