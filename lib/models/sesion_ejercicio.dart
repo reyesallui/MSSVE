@@ -12,6 +12,7 @@ class SesionEjercicio extends Equatable {
   final int idEjercicio;
   final Ejercicio ejercicio;
   final List<SerieDetalle> seriesRealizadas;
+  final int? duracionMinutos;
 
   const SesionEjercicio({
     required this.id,
@@ -19,6 +20,7 @@ class SesionEjercicio extends Equatable {
     required this.idEjercicio,
     required this.ejercicio,
     this.seriesRealizadas = const [],
+    this.duracionMinutos,
   });
 
   factory SesionEjercicio.fromJson(Map<String, dynamic> json) {
@@ -41,6 +43,7 @@ class SesionEjercicio extends Equatable {
       ejercicio:        Ejercicio.fromJson(
           json['ejercicio'] as Map<String, dynamic>),
       seriesRealizadas: series,
+      duracionMinutos:  json['duracion_minutos'] as int?,
     );
   }
 
@@ -53,9 +56,11 @@ class SesionEjercicio extends Equatable {
     'series_realizadas': seriesRealizadas.isEmpty
         ? null
         : jsonEncode(seriesRealizadas.map((s) => s.toJson()).toList()),
+    'duracion_minutos': duracionMinutos,
   };
 
   @override
   // seriesRealizadas incluido para detectar cambios al modificar pesos/reps
-  List<Object?> get props => [id, idSesion, idEjercicio, seriesRealizadas];
+  List<Object?> get props =>
+      [id, idSesion, idEjercicio, seriesRealizadas, duracionMinutos];
 }

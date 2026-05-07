@@ -49,12 +49,14 @@ class _FakeRepo implements RepositorySesion {
     required int idSesion,
     required int idEjercicio,
     List<SerieDetalle> seriesRealizadas = const [],
+    int? duracionMinutos,
   }) async => _ejercicioFake();
 
   @override
   Future<void> modificarEjercicioSesion({
     required int id,
     required List<SerieDetalle> seriesRealizadas,
+    int? duracionMinutos,
   }) async {}
 
   @override

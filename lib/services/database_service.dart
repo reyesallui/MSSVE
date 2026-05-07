@@ -34,6 +34,21 @@ class DatabaseService {
       secure: _secure,
     );
     await _connection!.connect();
+    await _ejecutarMigraciones();
+  }
+
+  // Migraciones automáticas al empezar: añade la columna duracion_minutos a sesion_ejercicio si no existe
+  Future<void> _ejecutarMigraciones() async {
+    try {
+      final check = await _connection!.execute(
+        "SHOW COLUMNS FROM sesion_ejercicio LIKE 'duracion_minutos'",
+      );
+      if (check.rows.isEmpty) {
+        await _connection!.execute(
+          'ALTER TABLE sesion_ejercicio ADD COLUMN duracion_minutos INT NULL',
+        );
+      }
+    } catch (_) {}
   }
 
   // Ejecuta SELECT y devuelve los resultados como lista de Maps

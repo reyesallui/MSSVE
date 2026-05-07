@@ -7,7 +7,7 @@ import 'package:mssve/models/sesion_ejercicio.dart';
 // Tarjeta de un ejercicio dentro de la sesión activa
 class SesionEjercicioCard extends StatefulWidget {
   final SesionEjercicio sesionEjercicio;
-  final void Function(List<SerieDetalle>)? onGuardar;
+  final void Function(List<SerieDetalle> series, int? duracionMinutos)? onGuardar;
   final VoidCallback? onEliminar;
 
   const SesionEjercicioCard({
@@ -37,11 +37,11 @@ class _SesionEjercicioCardState extends State<SesionEjercicioCard> {
   // /BUILD/
   @override
   Widget build(BuildContext context) {
-    final ejercicio  = widget.sesionEjercicio.ejercicio;
-    final esCardio   = ejercicio.esCardio;
-    final nombre     = ejercicio.nombrePara(context.locale.languageCode);
-    final series     = widget.sesionEjercicio.seriesRealizadas;
-    final tieneDatos = series.isNotEmpty;
+    final ejercicio    = widget.sesionEjercicio.ejercicio;
+    final esCardio     = ejercicio.esCardio;
+    final nombre       = ejercicio.nombrePara(context.locale.languageCode);
+    final series       = widget.sesionEjercicio.seriesRealizadas;
+    final tieneDatos   = series.isNotEmpty || widget.sesionEjercicio.duracionMinutos != null;
 
     //Solo se expande con ejercicio de fuerza que tengan datos.
     return GestureDetector(
@@ -125,16 +125,13 @@ class _SesionEjercicioCardState extends State<SesionEjercicioCard> {
 
             // /RESUMEN/
             const SizedBox(height: 6),
-            if (!tieneDatos)
+            if (esCardio) ...[
               Text(
-                esCardio
-                    ? 'sesion.no_duration_yet'.tr()
-                    : 'sesion.no_sets_yet'.tr(),
+                _textoDuracionCardio(),
                 style: const TextStyle(color: Colors.grey, fontSize: 12),
               )
-            else if (esCardio)
-              // cardio guarda los minutos en reps
-              Text('${series.first.reps} min',
+            ] else if (!tieneDatos)
+              Text('sesion.no_sets_yet'.tr(),
                   style: const TextStyle(color: Colors.grey, fontSize: 12))
             else
               Text(_resumenFuerza(series),
@@ -176,6 +173,14 @@ class _SesionEjercicioCardState extends State<SesionEjercicioCard> {
     );
   }
 
+  String _textoDuracionCardio() {
+    final dur = widget.sesionEjercicio.duracionMinutos;
+    if (dur != null) return '$dur min';
+    final series = widget.sesionEjercicio.seriesRealizadas;
+    if (series.isNotEmpty) return '${series.first.reps} min';
+    return 'sesion.no_duration_yet'.tr();
+  }
+
   // Agrupa reps y pesos distintos con / para el texto resumen
   String _resumenFuerza(List<SerieDetalle> series) {
     final n    = series.length;
@@ -195,10 +200,10 @@ class _SesionEjercicioCardState extends State<SesionEjercicioCard> {
 }
 
 // /DIÁLOGO DE EDICIÓN/
-//Si es cardio se edita una serie que son los minutos, si es fuerza se edita las series enteras y comprobamos que no hay 0 reps
+//Si es cardio se edita la duración, si es fuerza se edita las series enteras y comprobamos que no hay 0 reps
 class _EditarSeriesDialog extends StatefulWidget {
   final SesionEjercicio sesionEjercicio;
-  final void Function(List<SerieDetalle>)? onGuardar;
+  final void Function(List<SerieDetalle> series, int? duracionMinutos)? onGuardar;
 
   const _EditarSeriesDialog({
     required this.sesionEjercicio,
@@ -221,8 +226,8 @@ class _EditarSeriesDialogState extends State<_EditarSeriesDialog> {
     final series = widget.sesionEjercicio.seriesRealizadas;
 
     if (_esCardio) {
-      // cardio: reps guarda los minutos
-      final minutos = series.isNotEmpty ? series.first.reps : 0;
+      final minutos = widget.sesionEjercicio.duracionMinutos ??
+          (series.isNotEmpty ? series.first.reps : 0);
       _minCtrl = TextEditingController(
           text: minutos > 0 ? minutos.toString() : '');
       _ctrls = [];
@@ -287,12 +292,11 @@ class _EditarSeriesDialogState extends State<_EditarSeriesDialog> {
       }
     }
 
-    List<SerieDetalle> series;
     if (_esCardio) {
       final minutos = int.tryParse(_minCtrl.text.trim()) ?? 0;
-      series = [SerieDetalle(reps: minutos)];
+      widget.onGuardar?.call(const [], minutos > 0 ? minutos : null);
     } else {
-      series = _ctrls
+      final series = _ctrls
           .map((c) => SerieDetalle(
                 reps: int.tryParse(c.repsCtr.text.trim()) ?? 0,
                 peso: c.pesoCtr.text.isEmpty
@@ -300,8 +304,8 @@ class _EditarSeriesDialogState extends State<_EditarSeriesDialog> {
                     : double.tryParse(c.pesoCtr.text),
               ))
           .toList();
+      widget.onGuardar?.call(series, null);
     }
-    widget.onGuardar?.call(series);
     Navigator.pop(context);
   }
 

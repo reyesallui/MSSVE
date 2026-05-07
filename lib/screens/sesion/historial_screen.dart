@@ -447,10 +447,10 @@ class _ProgresionSheetState extends State<_ProgresionSheet> {
     for (final sesion in sesionesOrdenadas) {
       for (final se in sesion.ejercicios) {
         if (se.idEjercicio.toString() != idEjercicio) continue;
-        if (se.seriesRealizadas.isEmpty) continue;
+        if (se.seriesRealizadas.isEmpty && se.duracionMinutos == null) continue;
 
         if (se.ejercicio.esCardio) {
-          final minutos = se.seriesRealizadas.first.reps;
+          final minutos = se.duracionMinutos ?? se.seriesRealizadas.first.reps;
           puntos.add(_PuntoProgresion(
               fecha: sesion.fecha,
               valor: minutos.toDouble(),

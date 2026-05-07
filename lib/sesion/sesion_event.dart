@@ -52,12 +52,14 @@ class SesionSeleccionarEvent extends SesionEvent{
 class SesionModificarEjercicioEvent extends SesionEvent{
   final int id ;
   final List<SerieDetalle>seriesRealizadas;
+  final int? duracionMinutos;
   const SesionModificarEjercicioEvent({
     required this.id,
     required this.seriesRealizadas,
+    this.duracionMinutos,
   });
   @override
-  List<Object?>get props => [id];
+  List<Object?>get props => [id, duracionMinutos];
 }
 
 //Añadir ejercicio
@@ -65,12 +67,14 @@ class SesionModificarEjercicioEvent extends SesionEvent{
 class SesionAnadirEjercicioEvent extends SesionEvent{
   final int idEjercicio;
   final List<SerieDetalle>seriesRealizadas;
+  final int? duracionMinutos;
   const SesionAnadirEjercicioEvent({
     required this.idEjercicio,
     this.seriesRealizadas = const[],
+    this.duracionMinutos,
   });
   @override
-  List<Object?> get props => [idEjercicio];
+  List<Object?> get props => [idEjercicio, duracionMinutos];
 }
 
 //Eliminar ejercicio

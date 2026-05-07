@@ -107,6 +107,7 @@ class SesionBloc extends Bloc<SesionEvent, SesionState> {
       await _repository.modificarEjercicioSesion(
         id:               event.id,
         seriesRealizadas: event.seriesRealizadas,
+        duracionMinutos:  event.duracionMinutos,
       );
       final sesionActualizada =
           await _repository.getSesion(loaded.sesionActiva!.id);
@@ -133,6 +134,7 @@ class SesionBloc extends Bloc<SesionEvent, SesionState> {
         idSesion:         loaded.sesionActiva!.id,
         idEjercicio:      event.idEjercicio,
         seriesRealizadas: event.seriesRealizadas,
+        duracionMinutos:  event.duracionMinutos,
       );
       final sesionActualizada =
           await _repository.getSesion(loaded.sesionActiva!.id);

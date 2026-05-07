@@ -89,8 +89,8 @@ class RepositorySesion {
             : jsonEncode(re.seriesDetalle.map((s) => s.toJson()).toList());
 
         await _db.insert(
-          'INSERT INTO sesion_ejercicio (id_sesion, id_ejercicio, series_realizadas) VALUES (?, ?, ?)',
-          [insertId, re.idEjercicio, seriesJson],
+          'INSERT INTO sesion_ejercicio (id_sesion, id_ejercicio, series_realizadas, duracion_minutos) VALUES (?, ?, ?, ?)',
+          [insertId, re.idEjercicio, seriesJson, re.duracionMinutos],
         );
       }
 
@@ -124,6 +124,7 @@ class RepositorySesion {
   Future<void> modificarEjercicioSesion({
     required int id,
     required List<SerieDetalle> seriesRealizadas,
+    int? duracionMinutos,
   }) async {
     try {
       final seriesJson = seriesRealizadas.isEmpty
@@ -131,8 +132,8 @@ class RepositorySesion {
           : jsonEncode(seriesRealizadas.map((s) => s.toJson()).toList());
 
       await _db.query(
-        'UPDATE sesion_ejercicio SET series_realizadas = ? WHERE id = ?',
-        [seriesJson, id],
+        'UPDATE sesion_ejercicio SET series_realizadas = ?, duracion_minutos = ? WHERE id = ?',
+        [seriesJson, duracionMinutos, id],
       );
     } catch (e) {
       throw Exception('error.unknown');
@@ -144,14 +145,15 @@ class RepositorySesion {
     required int idSesion,
     required int idEjercicio,
     List<SerieDetalle> seriesRealizadas = const [],
+    int? duracionMinutos,
   }) async {
     try {
       final seriesJson = seriesRealizadas.isEmpty
           ? null
           : jsonEncode(seriesRealizadas.map((s) => s.toJson()).toList());
       final insertId = await _db.insert(
-        'INSERT INTO sesion_ejercicio (id_sesion, id_ejercicio, series_realizadas) VALUES (?, ?, ?)',
-        [idSesion, idEjercicio, seriesJson],
+        'INSERT INTO sesion_ejercicio (id_sesion, id_ejercicio, series_realizadas, duracion_minutos) VALUES (?, ?, ?, ?)',
+        [idSesion, idEjercicio, seriesJson, duracionMinutos],
       );
       return await _getSesionEjercicioById(insertId);
     } catch (e) {
@@ -184,15 +186,15 @@ class RepositorySesion {
       int idSesion) async {
     final rows = await _db.query(
       '''SELECT
-          se.id, se.id_sesion, se.id_ejercicio, se.series_realizadas,
-          e.id           AS e_id,
-          e.id_usuario   AS e_id_usuario,
-          e.nombre_es    AS e_nombre_es,
-          e.nombre_en    AS e_nombre_en,
-          e.nombre_fr    AS e_nombre_fr,
+          se.id, se.id_sesion, se.id_ejercicio, se.series_realizadas, se.duracion_minutos,
+          e.id             AS e_id,
+          e.id_usuario     AS e_id_usuario,
+          e.nombre_es      AS e_nombre_es,
+          e.nombre_en      AS e_nombre_en,
+          e.nombre_fr      AS e_nombre_fr,
           e.es_cardio,
-          e.grupo_muscular,
-          e.es_personalizado
+          e.grupo_muscular AS e_grupo_muscular,
+          e.es_personalizado AS e_es_personalizado
         FROM sesion_ejercicio se
         JOIN ejercicios e ON se.id_ejercicio = e.id
         WHERE se.id_sesion = ?''',
@@ -205,6 +207,7 @@ class RepositorySesion {
       'id_sesion':         row['id_sesion'],
       'id_ejercicio':      row['id_ejercicio'],
       'series_realizadas': row['series_realizadas'],
+      'duracion_minutos':  row['duracion_minutos'],
       'ejercicio': {
         'id':               row['e_id'],
         'id_usuario':       row['e_id_usuario'],
@@ -212,8 +215,8 @@ class RepositorySesion {
         'nombre_en':        row['e_nombre_en'],
         'nombre_fr':        row['e_nombre_fr'],
         'es_cardio':        row['es_cardio'],
-        'grupo_muscular':   row['grupo_muscular'],
-        'es_personalizado': row['es_personalizado'],
+        'grupo_muscular':   row['e_grupo_muscular'],
+        'es_personalizado': row['e_es_personalizado'],
       },
     }).toList();
   }
@@ -221,15 +224,15 @@ class RepositorySesion {
   Future<SesionEjercicio> _getSesionEjercicioById(int id) async {
     final rows = await _db.query(
       '''SELECT
-          se.id, se.id_sesion, se.id_ejercicio, se.series_realizadas,
-          e.id           AS e_id,
-          e.id_usuario   AS e_id_usuario,
-          e.nombre_es    AS e_nombre_es,
-          e.nombre_en    AS e_nombre_en,
-          e.nombre_fr    AS e_nombre_fr,
+          se.id, se.id_sesion, se.id_ejercicio, se.series_realizadas, se.duracion_minutos,
+          e.id             AS e_id,
+          e.id_usuario     AS e_id_usuario,
+          e.nombre_es      AS e_nombre_es,
+          e.nombre_en      AS e_nombre_en,
+          e.nombre_fr      AS e_nombre_fr,
           e.es_cardio,
-          e.grupo_muscular,
-          e.es_personalizado
+          e.grupo_muscular AS e_grupo_muscular,
+          e.es_personalizado AS e_es_personalizado
         FROM sesion_ejercicio se
         JOIN ejercicios e ON se.id_ejercicio = e.id
         WHERE se.id = ?''',
@@ -241,6 +244,7 @@ class RepositorySesion {
       'id_sesion':         row['id_sesion'],
       'id_ejercicio':      row['id_ejercicio'],
       'series_realizadas': row['series_realizadas'],
+      'duracion_minutos':  row['duracion_minutos'],
       'ejercicio': {
         'id':               row['e_id'],
         'id_usuario':       row['e_id_usuario'],
@@ -248,9 +252,10 @@ class RepositorySesion {
         'nombre_en':        row['e_nombre_en'],
         'nombre_fr':        row['e_nombre_fr'],
         'es_cardio':        row['es_cardio'],
-        'grupo_muscular':   row['grupo_muscular'],
-        'es_personalizado': row['es_personalizado'],
+        'grupo_muscular':   row['e_grupo_muscular'],
+        'es_personalizado': row['e_es_personalizado'],
       },
     });
   }
+
 }

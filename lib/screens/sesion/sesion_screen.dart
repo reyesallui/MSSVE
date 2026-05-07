@@ -74,16 +74,17 @@ class _SesionScreenState extends State<SesionScreen> {
                 context: context,
                 isScrollControlled: true,
                 backgroundColor: Colors.transparent,
-                builder: (_) => BlocProvider.value(
-                  value: rutinaBloc,
-                  child: _AddEjercicioSesionSheet(
-                    onAnadir: (idEjercicio, series) => sesionBloc.add(
-                      SesionAnadirEjercicioEvent(
-                          idEjercicio: idEjercicio,
-                          seriesRealizadas: series)),
-                    idUsuario: idUsuario,
+                  builder: (_) => BlocProvider.value(
+                    value: rutinaBloc,
+                    child: _AddEjercicioSesionSheet(
+                      onAnadir: (idEjercicio, series, duracionMinutos) => sesionBloc.add(
+                        SesionAnadirEjercicioEvent(
+                            idEjercicio: idEjercicio,
+                            seriesRealizadas: series,
+                            duracionMinutos: duracionMinutos)),
+                      idUsuario: idUsuario,
+                    ),
                   ),
-                ),
               );
             },
             child: const Icon(Icons.add, color: Colors.white),
@@ -160,11 +161,12 @@ class _SesionScreenState extends State<SesionScreen> {
                           final se = sesion.ejercicios[index];
                           return SesionEjercicioCard(
                             sesionEjercicio: se,
-                            onGuardar: (series) => context
+                            onGuardar: (series, duracionMinutos) => context
                                 .read<SesionBloc>()
                                 .add(SesionModificarEjercicioEvent(
                                   id: se.id,
                                   seriesRealizadas: series,
+                                  duracionMinutos: duracionMinutos,
                                 )),
                             onEliminar: () => context
                                 .read<SesionBloc>()
@@ -186,7 +188,7 @@ class _SesionScreenState extends State<SesionScreen> {
 // Sheet añadir ejercicio 
 // Dos pasos: buscador de ejercicios = formulario de series/reps/peso
 class _AddEjercicioSesionSheet extends StatefulWidget {
-  final void Function(int idEjercicio, List<SerieDetalle> series) onAnadir;
+  final void Function(int idEjercicio, List<SerieDetalle> series, int? duracionMinutos) onAnadir;
   final int idUsuario;
   const _AddEjercicioSesionSheet(
       {required this.onAnadir, required this.idUsuario});
@@ -225,16 +227,16 @@ class _AddEjercicioSesionSheetState
   }
 
   //Confirmar 
-  
+   
   void _confirmar() {
     if (_ejercicioSeleccionado == null) return;
 
-    List<SerieDetalle> series = [];
     if (_ejercicioSeleccionado!.esCardio) {
       final minutos = int.tryParse(_duracionCtrl.text) ?? 0;
-      if (minutos > 0) series = [SerieDetalle(reps: minutos)];
+      widget.onAnadir(
+          _ejercicioSeleccionado!.id, const [], minutos > 0 ? minutos : null);
     } else {
-      series = _series.map((s) {
+      final series = _series.map((s) {
         final dropsets = s.dropsetActivo
             ? s.dropsetCtrls
                 .map((c) => double.tryParse(c.text) ?? 0.0)
@@ -247,9 +249,8 @@ class _AddEjercicioSesionSheetState
           dropsets: dropsets,
         );
       }).toList();
+      widget.onAnadir(_ejercicioSeleccionado!.id, series, null);
     }
-
-    widget.onAnadir(_ejercicioSeleccionado!.id, series);
     Navigator.pop(context);
   }
 
