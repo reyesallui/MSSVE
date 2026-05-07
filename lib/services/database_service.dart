@@ -5,25 +5,14 @@ import 'package:mysql_client/mysql_client.dart';
 // query() e insert() que usan todos los repositorios.
 class DatabaseService {
   MySQLConnection? _connection;
-
-  //  NUBE 
-  // static const String _host     = 'autorack.proxy.rlwy.net';
-  // static const int    _port     = 44534;
-  // static const String _password = 'ptXcSGxBuJkZKNgKwBKVgMtkSJJyLYTK';
-  // static const bool   _secure   = true;
-
-  //LOCAL 
-  // En Android el emulador usa 10.0.2.2 para referirse al PC host
-  static String get _host =>
-      defaultTargetPlatform == TargetPlatform.android ? '10.0.2.2' : 'localhost';
+  static const String _host     = 'sql8.freesqldatabase.com';
   static const int    _port     = 3306;
-  static const bool   _secure   = true;
+  static const String _user     = 'sql8825716';
+  static const String _password = 'mTKy8mbhj5';
+  static const String _database = 'sql8825716';
+  static const bool   _secure   = false;
 
-  static const String _user     = 'root';
-  static const String _password = '1234';
-  static const String _database = 'mssve';
-
-  // Abre la conexión — se llama una sola vez al arrancar la app
+  // Abre la conexión  se llama una sola vez al arrancar la app
   Future<void> connect() async {
     _connection = await MySQLConnection.createConnection(
       host: _host,

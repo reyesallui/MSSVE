@@ -158,6 +158,7 @@ class RepositoryRutina {
     required String search,
     required int idUsuario,
     bool? esCardio,
+    String? grupoMuscular,
   }) async {
     try {
       // Buscamos en los tres idiomas para que la búsqueda funcione
@@ -172,6 +173,11 @@ class RepositoryRutina {
       if (esCardio != null) {
         sql += ' AND es_cardio = ?';
         params.add(esCardio ? 1 : 0);
+      }
+
+      if (grupoMuscular != null && grupoMuscular.isNotEmpty) {
+        sql += ' AND grupo_muscular = ?';
+        params.add(grupoMuscular);
       }
 
       sql += ' ORDER BY es_personalizado ASC, nombre_es ASC';

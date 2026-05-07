@@ -87,15 +87,17 @@ class RutinaBuscarEjerciciosEvent extends RutinaEvent {
   final String search;
   final int idUsuario;
   final bool? esCardio;
+  final String? grupoMuscular;
 
   const RutinaBuscarEjerciciosEvent({
     required this.search,
     required this.idUsuario,
     this.esCardio,
+    this.grupoMuscular,
   });
 
   @override
-  List<Object?> get props => [search];
+  List<Object?> get props => [search, grupoMuscular];
 }
 
 class RutinaCrearEjercicioEvent extends RutinaEvent {

@@ -203,6 +203,8 @@ class _AddEjercicioSesionSheetState
   final _searchCtrl   = TextEditingController();
   final _duracionCtrl = TextEditingController();
   Ejercicio? _ejercicioSeleccionado;
+  String? _grupoMuscular;
+  bool _esCardio = false;
   List<_SerieCtrlSesion> _series = [];
 
   @override
@@ -295,9 +297,109 @@ class _AddEjercicioSesionSheetState
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide.none),
               ),
-              onChanged: (v) => context.read<RutinaBloc>().add(
-                  RutinaBuscarEjerciciosEvent(
-                      search: v, idUsuario: widget.idUsuario)),
+              onChanged: (v) {
+                setState(() {
+                  _grupoMuscular = null;
+                  _esCardio = false;
+                });
+                context.read<RutinaBloc>().add(
+                    RutinaBuscarEjerciciosEvent(
+                        search: v, idUsuario: widget.idUsuario));
+              },
+            ),
+            const SizedBox(height: 8),
+            BlocBuilder<RutinaBloc, RutinaState>(
+              builder: (context, state) {
+                if (state is! RutinaLoaded) return const SizedBox();
+                final resultados = state.resultadosBusqueda;
+                final grupos = resultados
+                    .map((e) => e.grupoMuscular)
+                    .whereType<String>()
+                    .where((g) => g.isNotEmpty)
+                    .toSet()
+                    .toList()
+                  ..sort();
+                final hayCardio = resultados.any((e) => e.esCardio);
+                if (grupos.isEmpty && !hayCardio) return const SizedBox();
+                return SizedBox(
+                  height: 32,
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: (hayCardio ? 1 : 0) + grupos.length,
+                    separatorBuilder: (_, __) => const SizedBox(width: 8),
+                    itemBuilder: (context, i) {
+                      if (hayCardio && i == 0) {
+                        return GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _esCardio = !_esCardio;
+                              if (_esCardio) _grupoMuscular = null;
+                            });
+                            context.read<RutinaBloc>().add(
+                              RutinaBuscarEjerciciosEvent(
+                                search: _searchCtrl.text,
+                                idUsuario: widget.idUsuario,
+                                esCardio: _esCardio ? true : null,
+                                grupoMuscular: _esCardio ? null : _grupoMuscular,
+                              ),
+                            );
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: _esCardio
+                                  ? const Color(0xFFD32F2F)
+                                  : const Color(0xFF333333),
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: Text('Cardio',
+                              style: TextStyle(
+                                  color: _esCardio ? Colors.white : Colors.grey,
+                                  fontSize: 12)),
+                          ),
+                        );
+                      }
+                      final idx = hayCardio ? i - 1 : i;
+                      final g = grupos[idx];
+                      final selected = g == _grupoMuscular;
+                      return GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _grupoMuscular = selected ? null : g;
+                            if (_grupoMuscular != null) _esCardio = false;
+                          });
+                          context.read<RutinaBloc>().add(
+                            RutinaBuscarEjerciciosEvent(
+                              search: _searchCtrl.text,
+                              idUsuario: widget.idUsuario,
+                              grupoMuscular: _grupoMuscular,
+                              esCardio: _grupoMuscular != null ? null : _esCardio ? true : null,
+                            ),
+                          );
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: selected
+                                ? const Color(0xFFD32F2F)
+                                : const Color(0xFF333333),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Text(g,
+                              style: TextStyle(
+                                color: selected
+                                    ? Colors.white
+                                    : Colors.grey,
+                                fontSize: 12,
+                              )),
+                        ),
+                      );
+                    },
+                  ),
+                );
+              },
             ),
             const SizedBox(height: 8),
             Expanded(

@@ -170,6 +170,7 @@ class RutinaBloc extends Bloc<RutinaEvent, RutinaState> {
         search: event.search,
         idUsuario: event.idUsuario,
         esCardio: event.esCardio,
+        grupoMuscular: event.grupoMuscular,
       );
       if (state is RutinaLoaded) {
         emit((state as RutinaLoaded).copyWith(resultadosBusqueda: ejercicios));
