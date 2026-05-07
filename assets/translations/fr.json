@@ -163,5 +163,6 @@
     "edit_duration": "Modifier la durée",
     "max_duration": "Durée maximale (min)",
     "no_duration_yet": "Aucune durée enregistrée",
-"min_one_rep": "Les répétitions doivent être supérieures à 0"  }
+    "min_one_rep": "Chaque série nécessite au moins 1 répétition"
+  }
 }

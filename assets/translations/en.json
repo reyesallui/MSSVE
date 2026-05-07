@@ -163,5 +163,6 @@
     "edit_duration": "Edit duration",
     "max_duration": "Max duration (min)",
     "no_duration_yet": "No duration recorded",
-"min_one_rep": "Reps must be greater than 0"  }
+    "min_one_rep": "Each set needs at least 1 rep"
+  }
 }
