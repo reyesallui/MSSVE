@@ -37,12 +37,6 @@ class _NutricionScreenState extends State<NutricionScreen> {
   DateTime _fechaSeleccionada = DateTime.now();
 
   // Compara solo año, mes y día para saber si estamos en el día de hoy
-  bool get _esHoy {
-    final hoy = DateTime.now();
-    return _fechaSeleccionada.year  == hoy.year &&
-           _fechaSeleccionada.month == hoy.month &&
-           _fechaSeleccionada.day   == hoy.day;
-  }
 
   // Límite máximo de 7 días hacia el futuro.
   // Normalizamos las fechas eliminando la hora para comparar solo día/mes/año.

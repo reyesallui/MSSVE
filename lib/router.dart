@@ -6,8 +6,7 @@ import 'package:mssve/BLoC/home/home_bloc.dart';
 import 'package:mssve/BLoC/nutricion/nutricion_bloc.dart';
 import 'package:mssve/BLoC/perfil/perfil_bloc.dart';
 import 'package:mssve/BLoC/rutina/rutina_bloc.dart';
-import 'package:mssve/sesion/sesion_bloc.dart';
-
+import 'package:mssve/BLoC/sesion/sesion_bloc.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/auth/register_screen.dart';
 import 'screens/home/home_screen.dart';
@@ -18,6 +17,7 @@ import 'screens/sesion/historial_screen.dart';
 import 'screens/sesion/sesion_screen.dart';
 import 'service_locator.dart';
 
+//Parte del codigo - Configuracion de rutas con GoRouter
 class AppRouter {
   AppRouter._();
 
@@ -30,7 +30,6 @@ class AppRouter {
         final authState = authBloc.state;
         final isAuthPage = state.matchedLocation == '/login' ||
             state.matchedLocation == '/register';
-
         if (authState is AuthLoading || authState is AuthInitial) return null;
         if (authState is AuthUnauthenticated || authState is AuthFailure) {
           return isAuthPage ? null : '/login';
@@ -39,44 +38,32 @@ class AppRouter {
         return null;
       },
       routes: [
-        GoRoute(
-          path: '/login',
-          builder: (context, state) => const LoginScreen(),
-        ),
-        GoRoute(
-          path: '/register',
-          builder: (context, state) => const RegisterScreen(),
-        ),
+        GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
+        GoRoute(path: '/register', builder: (context, state) => const RegisterScreen()),
         GoRoute(
           path: '/home',
           builder: (context, state) => BlocProvider(
-            create: (_) => sl<HomeBloc>(),
-            child: const HomeScreen(),
+            create: (_) => sl<HomeBloc>(), child: const HomeScreen(),
           ),
         ),
         GoRoute(
           path: '/nutricion',
           builder: (context, state) => BlocProvider(
-            create: (_) => sl<NutricionBloc>(),
-            child: const NutricionScreen(),
+            create: (_) => sl<NutricionBloc>(), child: const NutricionScreen(),
           ),
         ),
         GoRoute(
           path: '/rutina',
           builder: (context, state) => BlocProvider(
-            create: (_) => sl<RutinaBloc>(),
-            child: const RutinaScreen(),
+            create: (_) => sl<RutinaBloc>(), child: const RutinaScreen(),
           ),
         ),
         GoRoute(
           path: '/perfil',
           builder: (context, state) => BlocProvider(
-            create: (_) => sl<PerfilBloc>(),
-            child: const PerfilScreen(),
+            create: (_) => sl<PerfilBloc>(), child: const PerfilScreen(),
           ),
         ),
-        // SesionBloc se comparte entre historial y sesión activa
-        // usando MultiBlocProvider para que ambas pantallas accedan al mismo estado
         GoRoute(
           path: '/historial',
           builder: (context, state) => MultiBlocProvider(
@@ -101,26 +88,20 @@ class AppRouter {
       errorBuilder: (context, state) => Scaffold(
         backgroundColor: const Color(0xFF0A0A0A),
         body: Center(
-          child: Text(
-            'Ruta no encontrada: ${state.uri}',
-            style: const TextStyle(color: Colors.grey),
-          ),
+          child: Text('Ruta no encontrada: ${state.uri}',
+              style: const TextStyle(color: Colors.grey)),
         ),
       ),
     );
   }
 }
 
+//Parte del codigo - Suscripcion al stream de AuthBloc para refrescar GoRouter
 class GoRouterRefreshStream extends ChangeNotifier {
   GoRouterRefreshStream(Stream<dynamic> stream) {
     _subscription = stream.listen((_) => notifyListeners());
   }
-
   late final dynamic _subscription;
-
   @override
-  void dispose() {
-    _subscription.cancel();
-    super.dispose();
-  }
+  void dispose() { _subscription.cancel(); super.dispose(); }
 }

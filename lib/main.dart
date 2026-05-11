@@ -10,10 +10,8 @@ import 'package:mssve/theme.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
-
   await setupServiceLocator();
   await sl<DatabaseService>().connect();
-
   runApp(
     EasyLocalization(
       supportedLocales: const [Locale('es'), Locale('en'), Locale('fr')],
@@ -24,6 +22,7 @@ void main() async {
   );
 }
 
+//Parte del codigo
 class MssveApp extends StatelessWidget {
   const MssveApp({super.key});
 
@@ -39,8 +38,6 @@ class MssveApp extends StatelessWidget {
             theme: AppTheme.darkTheme,
             localizationsDelegates: context.localizationDelegates,
             supportedLocales: context.supportedLocales,
-            // Leer locale aquí hace que MaterialApp.router se reconstruya
-            // al cambiar idioma, lo que fuerza el rebuild de todas las rutas
             locale: context.locale,
             routerConfig: sl<GoRouter>(),
           );

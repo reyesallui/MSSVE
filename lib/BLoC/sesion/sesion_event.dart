@@ -6,9 +6,7 @@ abstract class SesionEvent extends Equatable{
   List<Object?> get props => [];
 }
 
-//Historial 
-//Carga el historial del usuario
-
+// Evento para cargar todo el historial de entrenamientos del usuario
 class SesionCargarHistorialEvent extends SesionEvent{
   final int idUsuario;
   const SesionCargarHistorialEvent(this.idUsuario);
@@ -16,8 +14,8 @@ class SesionCargarHistorialEvent extends SesionEvent{
   List<Object?>get props => [idUsuario];
 }
 
-//Crear sesión 
-//Crea una sesión nueva o carga la existente si hay ya una para esa fecha y rutina
+// Crea una sesion nueva. Si ya existe una para la misma fecha y rutina,
+// el BLoC la carga directamente sin duplicar (logica en _onCrear).
 class SesionCrearEvent extends SesionEvent{
   final int idRutina;
   final int idUsuario;
@@ -37,9 +35,7 @@ class SesionCrearEvent extends SesionEvent{
   List<Object?> get props => [idRutina,idUsuario,fecha];
 }
 
-//Seleccionar sesion
-//Seleccionamos una sesión para ver su historial
-
+// Selecciona una sesion del historial para verla en detalle o trabajar con ella
 class SesionSeleccionarEvent extends SesionEvent{
   final SesionEntrenamiento sesion;
   const SesionSeleccionarEvent(this.sesion);
@@ -47,8 +43,7 @@ class SesionSeleccionarEvent extends SesionEvent{
   List<Object?> get props => [sesion.id];
 }
 
-//Modificar ejercicio 
-//Guarda los pesos y series reales que el usuario hizo en un ejercicio 
+// Guarda los pesos, repeticiones y series reales que el usuario hizo en un ejercicio
 class SesionModificarEjercicioEvent extends SesionEvent{
   final int id ;
   final List<SerieDetalle>seriesRealizadas;
@@ -62,8 +57,7 @@ class SesionModificarEjercicioEvent extends SesionEvent{
   List<Object?>get props => [id, duracionMinutos];
 }
 
-//Añadir ejercicio
-//Añade un ejercicio extra a la sesión.
+// Anade un ejercicio extra a la sesion activa (por si el usuario decide anadir algo sobre la marcha)
 class SesionAnadirEjercicioEvent extends SesionEvent{
   final int idEjercicio;
   final List<SerieDetalle>seriesRealizadas;
@@ -77,7 +71,7 @@ class SesionAnadirEjercicioEvent extends SesionEvent{
   List<Object?> get props => [idEjercicio, duracionMinutos];
 }
 
-//Eliminar ejercicio
+// Elimina un ejercicio de la sesion activa
 
 class SesionEliminarEjercicioEvent extends SesionEvent{
   final int id; 
@@ -87,7 +81,7 @@ class SesionEliminarEjercicioEvent extends SesionEvent{
 
 }
 
-//Eliminar Sesión
+// Elimina una sesion completa del historial
 class SesionEliminarEvent extends SesionEvent{
   final int id; 
   const SesionEliminarEvent({required this.id});

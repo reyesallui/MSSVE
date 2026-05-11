@@ -6,7 +6,7 @@ import 'package:mssve/models/rutina_ejercicio.dart';
 import 'package:mssve/models/sesion_ejercicio.dart';
 import 'package:mssve/models/sesion_entrenamiento.dart';
 import 'package:mssve/repositories/repository_sesion.dart';
-import 'package:mssve/sesion/sesion_bloc.dart';
+import 'package:mssve/BLoC/sesion/sesion_bloc.dart';
 import 'package:mssve/services/crypto_helper.dart';
 import 'package:mssve/services/get_calculator.dart';
 

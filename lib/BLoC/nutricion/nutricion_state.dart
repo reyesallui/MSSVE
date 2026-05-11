@@ -2,7 +2,6 @@ part of 'nutricion_bloc.dart';
 
 abstract class NutricionState extends Equatable {
   const NutricionState();
-
   @override
   List<Object?> get props => [];
 }
@@ -15,12 +14,9 @@ class NutricionLoading extends NutricionState {
   const NutricionLoading();
 }
 
-// Estado principal que contiene todos los datos de la pantalla.
-// Usamos copyWith para actualizar solo los campos que cambian
-// sin tener que recrear el objeto entero cada vez
 class NutricionLoaded extends NutricionState {
   final RegistroDiario registroDiario;
-  final String tipoComidaActivo;       // pestaña seleccionada
+  final String tipoComidaActivo;
   final List<Alimento> resultadosBusqueda;
 
   const NutricionLoaded({
@@ -42,18 +38,12 @@ class NutricionLoaded extends NutricionState {
   }
 
   @override
-  List<Object?> get props => [
-        registroDiario,
-        tipoComidaActivo,
-        resultadosBusqueda,
-      ];
+  List<Object?> get props => [registroDiario, tipoComidaActivo, resultadosBusqueda];
 }
 
 class NutricionError extends NutricionState {
   final String message;
-
   const NutricionError(this.message);
-
   @override
   List<Object?> get props => [message];
 }

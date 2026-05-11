@@ -14,8 +14,6 @@ class HomeLoading extends HomeState {
   const HomeLoading();
 }
 
-// *** Estado cargado ***
-// Incluye usuario fresco para que las kcal objetivo estén siempre actualizadas
 class HomeLoaded extends HomeState {
   final RegistroDiario registroDiario;
   final List<Rutina> rutinas;

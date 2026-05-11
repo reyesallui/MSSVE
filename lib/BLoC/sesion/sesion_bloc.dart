@@ -2,10 +2,9 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
-import '../models/rutina_ejercicio.dart';
-import '../models/sesion_ejercicio.dart';
-import '../models/sesion_entrenamiento.dart';
-import '../repositories/repository_sesion.dart';
+import '../../models/rutina_ejercicio.dart';
+import '../../models/sesion_entrenamiento.dart';
+import '../../repositories/repository_sesion.dart';
 
 part 'sesion_event.dart';
 part 'sesion_state.dart';
@@ -63,12 +62,12 @@ class SesionBloc extends Bloc<SesionEvent, SesionState> {
       );
 
       if (sesionExistente != null) {
-        // Ya existe → la seleccionamos sin crear duplicado
+        // Ya existe la seleccionamos sin crear duplicado
         emit(loaded.copyWith(sesionActiva: sesionExistente));
         return;
       }
 
-      // No existe → creamos nueva con los ejercicios de la plantilla como punto de partida
+      // No existe creamos nueva con los ejercicios de la plantilla como punto de partida
       final sesion = await _repository.crearSesion(
         idRutina:            event.idRutina,
         idUsuario:           event.idUsuario,
