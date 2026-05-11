@@ -217,6 +217,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
           label: 'register.gender'.tr(),
           value: _genero,
           opciones: const ['Hombre', 'Mujer'],
+          clavesTraduccion: const {
+            'Hombre': 'register.gender_male',
+            'Mujer': 'register.gender_female',
+          },
           onChanged: (v) => setState(() => _genero = v),
         ),
         const SizedBox(height: 12),
@@ -224,6 +228,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
           label: 'register.objective'.tr(),
           value: _objetivo,
           opciones: const ['Recomposicion', 'Volumen', 'Definicion'],
+          clavesTraduccion: const {
+            'Recomposicion': 'register.objective_recomposition',
+            'Volumen': 'register.objective_volume',
+            'Definicion': 'register.objective_definition',
+          },
           onChanged: (v) => setState(() => _objetivo = v),
         ),
         const SizedBox(height: 12),
@@ -231,6 +240,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
           label: 'register.activity_level'.tr(),
           value: _nivelActividad,
           opciones: const ['Sedentario', 'Ligero', 'Moderado', 'Intenso', 'Muy_intenso'],
+          clavesTraduccion: const {
+            'Sedentario': 'register.activity_sedentary',
+            'Ligero': 'register.activity_light',
+            'Moderado': 'register.activity_moderate',
+            'Intenso': 'register.activity_intense',
+            'Muy_intenso': 'register.activity_very_intense',
+          },
           onChanged: (v) => setState(() => _nivelActividad = v),
         ),
         const SizedBox(height: 32),
@@ -250,12 +266,14 @@ class _Selector extends StatelessWidget {
   final String label;
   final String value;
   final List<String> opciones;
+  final Map<String, String> clavesTraduccion;
   final void Function(String) onChanged;
 
   const _Selector({
     required this.label,
     required this.value,
     required this.opciones,
+    required this.clavesTraduccion,
     required this.onChanged,
   });
 
@@ -281,7 +299,10 @@ class _Selector extends StatelessWidget {
                 borderSide: const BorderSide(color: Color(0xFF333333))),
           ),
           items: opciones
-              .map((o) => DropdownMenuItem(value: o, child: Text(o)))
+              .map((o) => DropdownMenuItem(
+                    value: o,
+                    child: Text(clavesTraduccion[o]?.tr() ?? o),
+                  ))
               .toList(),
           onChanged: (v) => v != null ? onChanged(v) : null,
         ),

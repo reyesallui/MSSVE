@@ -183,6 +183,7 @@ class _AccesoRapido extends StatelessWidget {
   final IconData icon;
   final String label;
   final VoidCallback onTap;
+ 
   const _AccesoRapido({
     required this.icon,
     required this.label,
