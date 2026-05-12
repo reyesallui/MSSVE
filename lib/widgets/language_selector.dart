@@ -9,9 +9,9 @@ class LanguageSelector extends StatelessWidget {
   const LanguageSelector({super.key});
 
   static const _idiomas = [
-    {'locale': Locale('es'), 'label': 'Español'},
-    {'locale': Locale('en'), 'label': 'English'},
-    {'locale': Locale('fr'), 'label': 'Français'},
+    {'locale': Locale('es'), 'label': 'Español', 'flag': '🇪🇸'},
+    {'locale': Locale('en'), 'label': 'English', 'flag': '🇬🇧'},
+    {'locale': Locale('fr'), 'label': 'Français', 'flag': '🇫🇷'},
   ];
 
   @override

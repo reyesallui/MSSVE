@@ -7,6 +7,8 @@ import 'package:intl/intl.dart';
 
 import 'package:mssve/models/rutina.dart';
 import 'package:mssve/BLoC/rutina/rutina_bloc.dart';
+import 'package:mssve/repositories/repository_rutina.dart';
+import 'package:mssve/service_locator.dart';
 import 'package:mssve/widgets/add_exercise_bottom_sheet.dart';
 import 'package:mssve/widgets/app_drawer.dart';
 import 'package:mssve/widgets/exercise_card.dart';
@@ -169,18 +171,61 @@ class _RutinaScreenState extends State<RutinaScreen> {
                   style: const TextStyle(color: Colors.grey)),
             ),
             TextButton(
-              onPressed: () {
-                if (nombreCtrl.text.trim().isEmpty) return;
+              onPressed: () async {
+                final nombre = nombreCtrl.text.trim();
+                if (nombre.isEmpty || !RegExp(r'[a-zA-Záéíóúñ]').hasMatch(nombre)) {
+                  await showDialog(
+                    context: ctx,
+                    builder: (_) => AlertDialog(
+                      backgroundColor: const Color(0xFF1A1A1A),
+                      title: const Text('Datos inválidos',
+                          style: TextStyle(color: Colors.white)),
+                      content: const Text('Introduzca caracteres válidos',
+                          style: TextStyle(color: Colors.grey)),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(_),
+                          child: const Text('OK',
+                              style: TextStyle(color: Color(0xFFD32F2F))),
+                        ),
+                      ],
+                    ),
+                  );
+                  return;
+                }
+                final existe = await sl<RepositoryRutina>()
+                    .existeEjercicioConNombre(nombre, idUsuario);
+                if (existe) {
+                  await showDialog(
+                    context: ctx,
+                    builder: (_) => AlertDialog(
+                      backgroundColor: const Color(0xFF1A1A1A),
+                      title: const Text('Nombre duplicado',
+                          style: TextStyle(color: Colors.white)),
+                      content: const Text('Ya existe un ejercicio con ese nombre',
+                          style: TextStyle(color: Colors.grey)),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(_),
+                          child: const Text('OK',
+                              style: TextStyle(color: Color(0xFFD32F2F))),
+                        ),
+                      ],
+                    ),
+                  );
+                  return;
+                }
+                if (!ctx.mounted) return;
                 context.read<RutinaBloc>().add(RutinaCrearEjercicioEvent(
                       idUsuario: idUsuario,
-                      nombre: nombreCtrl.text.trim(),
+                      nombre: nombre,
                       esCardio: esCardio,
                       grupoMuscular: esCardio ? null : grupoMuscular,
                     ));
                 Navigator.pop(ctx);
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                   content: Text('rutina.exercise_created'
-                      .tr(args: [nombreCtrl.text.trim()])),
+                      .tr(args: [nombre])),
                   backgroundColor: const Color(0xFF2E7D32),
                 ));
               },
@@ -426,18 +471,61 @@ class _DetalleRutina extends StatelessWidget {
                   style: const TextStyle(color: Colors.grey)),
             ),
             TextButton(
-              onPressed: () {
-                if (nombreCtrl.text.trim().isEmpty) return;
+              onPressed: () async {
+                final nombre = nombreCtrl.text.trim();
+                if (nombre.isEmpty || !RegExp(r'[a-zA-Záéíóúñ]').hasMatch(nombre)) {
+                  await showDialog(
+                    context: ctx,
+                    builder: (_) => AlertDialog(
+                      backgroundColor: const Color(0xFF1A1A1A),
+                      title: const Text('Datos inválidos',
+                          style: TextStyle(color: Colors.white)),
+                      content: const Text('Introduzca caracteres válidos',
+                          style: TextStyle(color: Colors.grey)),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(_),
+                          child: const Text('OK',
+                              style: TextStyle(color: Color(0xFFD32F2F))),
+                        ),
+                      ],
+                    ),
+                  );
+                  return;
+                }
+                final existe = await sl<RepositoryRutina>()
+                    .existeEjercicioConNombre(nombre, idUsuario);
+                if (existe) {
+                  await showDialog(
+                    context: ctx,
+                    builder: (_) => AlertDialog(
+                      backgroundColor: const Color(0xFF1A1A1A),
+                      title: const Text('Nombre duplicado',
+                          style: TextStyle(color: Colors.white)),
+                      content: const Text('Ya existe un ejercicio con ese nombre',
+                          style: TextStyle(color: Colors.grey)),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(_),
+                          child: const Text('OK',
+                              style: TextStyle(color: Color(0xFFD32F2F))),
+                        ),
+                      ],
+                    ),
+                  );
+                  return;
+                }
+                if (!ctx.mounted) return;
                 context.read<RutinaBloc>().add(RutinaCrearEjercicioEvent(
                       idUsuario: idUsuario,
-                      nombre: nombreCtrl.text.trim(),
+                      nombre: nombre,
                       esCardio: esCardio,
                       grupoMuscular: esCardio ? null : grupoMuscular,
                     ));
                 Navigator.pop(ctx);
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                   content: Text('rutina.exercise_created'
-                      .tr(args: [nombreCtrl.text.trim()])),
+                      .tr(args: [nombre])),
                   backgroundColor: const Color(0xFF2E7D32),
                 ));
               },

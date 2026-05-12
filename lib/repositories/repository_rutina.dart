@@ -195,6 +195,20 @@ class RepositoryRutina {
     }
   }
 
+  Future<bool> existeEjercicioConNombre(String nombre, int idUsuario) async {
+    try {
+      final results = await _db.query(
+        '''SELECT COUNT(*) as cnt FROM ejercicios
+           WHERE LOWER(nombre_es) = LOWER(?)
+           AND id_usuario = ?''',
+        [nombre, idUsuario],
+      );
+      return (int.tryParse(results.first['cnt'].toString()) ?? 0) > 0;
+    } catch (e) {
+      return false;
+    }
+  }
+
   Future<Ejercicio> crearEjercicio({
     required int idUsuario,
     required String nombre,

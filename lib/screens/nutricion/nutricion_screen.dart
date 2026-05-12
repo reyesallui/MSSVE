@@ -126,7 +126,7 @@ class _NutricionScreenState extends State<NutricionScreen> {
     
     final datos = await showDialog<Map<String, dynamic>>(
       context: context,
-      builder: (_) => const CreateFoodDialog(),
+      builder: (_) => CreateFoodDialog(idUsuario: authState.usuario.id),
     );
     if (datos == null || !context.mounted) return;
 
@@ -169,7 +169,10 @@ class _NutricionScreenState extends State<NutricionScreen> {
     
     final datos = await showDialog<Map<String, dynamic>>(
       context: context,
-      builder: (_) => CreateFoodDialog(alimentoEditar: alimento),
+      builder: (_) => CreateFoodDialog(
+        alimentoEditar: alimento,
+        idUsuario: authState.usuario.id,
+      ),
     );
     if (datos == null || !context.mounted) return;
 

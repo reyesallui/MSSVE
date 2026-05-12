@@ -143,6 +143,20 @@ class RepositoryNutricion {
   }
 
   
+  Future<bool> existeAlimentoConNombre(String nombre, int idUsuario) async {
+    try {
+      final results = await _db.query(
+        '''SELECT COUNT(*) as cnt FROM alimentos
+           WHERE LOWER(nombre) = LOWER(?)
+           AND id_usuario = ?''',
+        [nombre, idUsuario],
+      );
+      return (int.tryParse(results.first['cnt'].toString()) ?? 0) > 0;
+    } catch (e) {
+      return false;
+    }
+  }
+
   Future<Alimento> crearAlimento({
     required int idUsuario,
     required String nombre,

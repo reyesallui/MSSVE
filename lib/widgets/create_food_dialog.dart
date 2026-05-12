@@ -2,15 +2,14 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 import 'package:mssve/models/alimento.dart';
+import 'package:mssve/repositories/repository_nutricion.dart';
+import 'package:mssve/service_locator.dart';
 
-
-
-
-// Dialogo para crear alimento personalizado con macros
 class CreateFoodDialog extends StatefulWidget {
   final Alimento? alimentoEditar;
+  final int idUsuario;
 
-  const CreateFoodDialog({super.key, this.alimentoEditar});
+  const CreateFoodDialog({super.key, this.alimentoEditar, required this.idUsuario});
 
   @override
   State<CreateFoodDialog> createState() => _CreateFoodDialogState();
@@ -29,12 +28,12 @@ class _CreateFoodDialogState extends State<CreateFoodDialog> {
   void initState() {
     super.initState();
     final a = widget.alimentoEditar;
-    
-    _nombreCtrl   = TextEditingController(text: a?.nombre ?? '');
-    _kcalCtrl     = TextEditingController(text: a != null ? a.kcalPor100g.toString() : '');
+
+    _nombreCtrl = TextEditingController(text: a?.nombre ?? '');
+    _kcalCtrl = TextEditingController(text: a != null ? a.kcalPor100g.toString() : '');
     _proteinasCtrl = TextEditingController(text: a != null ? a.proteinasPor100g.toString() : '');
-    _carbosCtrl   = TextEditingController(text: a != null ? a.carbohidratosPor100g.toString() : '');
-    _grasasCtrl   = TextEditingController(text: a != null ? a.grasasPor100g.toString() : '');
+    _carbosCtrl = TextEditingController(text: a != null ? a.carbohidratosPor100g.toString() : '');
+    _grasasCtrl = TextEditingController(text: a != null ? a.grasasPor100g.toString() : '');
   }
 
   @override
@@ -44,16 +43,79 @@ class _CreateFoodDialogState extends State<CreateFoodDialog> {
     super.dispose();
   }
 
-  void _confirmar() {
-    if (_nombreCtrl.text.trim().isEmpty) return;
-    if (double.tryParse(_kcalCtrl.text) == null) return;
+  Future<void> _confirmar() async {
+    final nombre = _nombreCtrl.text.trim();
+    if (nombre.isEmpty || !RegExp(r'[a-zA-Záéíóúñ]').hasMatch(nombre)) {
+      await showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          backgroundColor: const Color(0xFF1A1A1A),
+          title: const Text('Datos inválidos',
+              style: TextStyle(color: Colors.white)),
+          content: const Text('Introduzca caracteres válidos',
+              style: TextStyle(color: Colors.grey)),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(_),
+              child: const Text('OK',
+                  style: TextStyle(color: Color(0xFFD32F2F))),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
+    if (double.tryParse(_kcalCtrl.text) == null) {
+      await showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          backgroundColor: const Color(0xFF1A1A1A),
+          title: const Text('Datos inválidos',
+              style: TextStyle(color: Colors.white)),
+          content: const Text('Introduzca un valor válido para las kcal',
+              style: TextStyle(color: Colors.grey)),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(_),
+              child: const Text('OK',
+                  style: TextStyle(color: Color(0xFFD32F2F))),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
+    if (!_esEdicion) {
+      final existe = await sl<RepositoryNutricion>()
+          .existeAlimentoConNombre(nombre, widget.idUsuario);
+      if (existe) {
+        await showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+            backgroundColor: const Color(0xFF1A1A1A),
+            title: const Text('Nombre duplicado',
+                style: TextStyle(color: Colors.white)),
+            content: const Text('Ya existe un alimento con ese nombre',
+                style: TextStyle(color: Colors.grey)),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(_),
+                child: const Text('OK',
+                    style: TextStyle(color: Color(0xFFD32F2F))),
+              ),
+            ],
+          ),
+        );
+        return;
+      }
+    }
 
     Navigator.pop(context, {
-      'nombre':                _nombreCtrl.text.trim(),
-      'kcal_por_100g':         double.parse(_kcalCtrl.text),
-      'proteinas_por_100g':    double.tryParse(_proteinasCtrl.text) ?? 0,
+      'nombre': nombre,
+      'kcal_por_100g': double.parse(_kcalCtrl.text),
+      'proteinas_por_100g': double.tryParse(_proteinasCtrl.text) ?? 0,
       'carbohidratos_por_100g': double.tryParse(_carbosCtrl.text) ?? 0,
-      'grasas_por_100g':       double.tryParse(_grasasCtrl.text) ?? 0,
+      'grasas_por_100g': double.tryParse(_grasasCtrl.text) ?? 0,
     });
   }
 
@@ -71,15 +133,15 @@ class _CreateFoodDialogState extends State<CreateFoodDialog> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            _Campo(ctrl: _nombreCtrl,   label: 'common.name'.tr()),
+            _Campo(ctrl: _nombreCtrl, label: 'common.name'.tr()),
             const SizedBox(height: 10),
-            _Campo(ctrl: _kcalCtrl,     label: 'macro.kcal'.tr(),    numeric: true),
+            _Campo(ctrl: _kcalCtrl, label: 'macro.kcal'.tr(), numeric: true),
             const SizedBox(height: 10),
             _Campo(ctrl: _proteinasCtrl, label: 'macro.proteins'.tr(), numeric: true),
             const SizedBox(height: 10),
-            _Campo(ctrl: _carbosCtrl,   label: 'macro.carbs'.tr(),   numeric: true),
+            _Campo(ctrl: _carbosCtrl, label: 'macro.carbs'.tr(), numeric: true),
             const SizedBox(height: 10),
-            _Campo(ctrl: _grasasCtrl,   label: 'macro.fats'.tr(),    numeric: true),
+            _Campo(ctrl: _grasasCtrl, label: 'macro.fats'.tr(), numeric: true),
             const SizedBox(height: 6),
             Text('nutricion.values_per_100g'.tr(),
                 style: const TextStyle(color: Colors.grey, fontSize: 11)),

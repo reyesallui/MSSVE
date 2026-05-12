@@ -235,6 +235,10 @@ class _PerfilScreenState extends State<PerfilScreen>
             label: 'register.gender'.tr(),
             value: _genero,
             opciones: const ['Hombre', 'Mujer'],
+            traducciones: {
+              'Hombre': 'register.gender_male'.tr(),
+              'Mujer': 'register.gender_female'.tr(),
+            },
             onChanged: (v) => setState(() => _genero = v),
           ),
           const SizedBox(height: 12),
@@ -242,6 +246,11 @@ class _PerfilScreenState extends State<PerfilScreen>
             label: 'register.objective'.tr(),
             value: _objetivo,
             opciones: const ['Recomposicion', 'Volumen', 'Definicion'],
+            traducciones: {
+              'Recomposicion': 'register.objective_recomposition'.tr(),
+              'Volumen': 'register.objective_volume'.tr(),
+              'Definicion': 'register.objective_definition'.tr(),
+            },
             onChanged: (v) => setState(() => _objetivo = v),
           ),
           const SizedBox(height: 12),
@@ -249,6 +258,13 @@ class _PerfilScreenState extends State<PerfilScreen>
             label: 'register.activity_level'.tr(),
             value: _nivelActividad,
             opciones: const ['Sedentario', 'Ligero', 'Moderado', 'Intenso', 'Muy_intenso'],
+            traducciones: {
+              'Sedentario': 'register.activity_sedentary'.tr(),
+              'Ligero': 'register.activity_light'.tr(),
+              'Moderado': 'register.activity_moderate'.tr(),
+              'Intenso': 'register.activity_intense'.tr(),
+              'Muy_intenso': 'register.activity_very_intense'.tr(),
+            },
             onChanged: (v) => setState(() => _nivelActividad = v),
           ),
           const SizedBox(height: 32),
@@ -331,12 +347,14 @@ class _DropdownField extends StatelessWidget {
   final String label;
   final String value;
   final List<String> opciones;
+  final Map<String, String>? traducciones;
   final void Function(String) onChanged;
 
   const _DropdownField({
     required this.label,
     required this.value,
     required this.opciones,
+    this.traducciones,
     required this.onChanged,
   });
 
@@ -359,7 +377,10 @@ class _DropdownField extends StatelessWidget {
             borderSide: const BorderSide(color: Color(0xFF333333))),
       ),
       items: opciones
-          .map((o) => DropdownMenuItem(value: o, child: Text(o)))
+          .map((o) => DropdownMenuItem(
+                value: o,
+                child: Text(traducciones?[o] ?? o),
+              ))
           .toList(),
       onChanged: (v) => v != null ? onChanged(v) : null,
     );
