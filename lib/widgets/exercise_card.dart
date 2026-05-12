@@ -5,6 +5,10 @@ import 'package:mssve/models/rutina_ejercicio.dart';
 
 
 
+const _maxReps = 999;
+const _maxMinutos = 999;
+const _maxPeso = 999;
+
 // Tarjeta de ejercicio con datos de series, peso y dropsets
 class ExerciseCard extends StatefulWidget {
   final RutinaEjercicio rutinaEjercicio;
@@ -322,8 +326,38 @@ class _EditarDetalleDialogState extends State<_EditarDetalleDialog> {
     super.dispose();
   }
 
+  void _mostrarError(String mensaje) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: const Color(0xFF1A1A1A),
+        content: Text(mensaje,
+            style: const TextStyle(color: Colors.white),
+            textAlign: TextAlign.center),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('OK',
+                style: TextStyle(color: Color(0xFFD32F2F))),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _guardar() {
-    
+    for (final c in _ctrls) {
+      final reps = int.tryParse(c.repsCtr.text) ?? 0;
+      if (reps < 1 || reps > _maxReps) {
+        _mostrarError('Las repeticiones deben estar entre 1 y $_maxReps');
+        return;
+      }
+      final peso = double.tryParse(c.pesoCtr.text);
+      if (peso != null && (peso < 0 || peso > _maxPeso)) {
+        _mostrarError('El peso debe estar entre 0 y $_maxPeso kg');
+        return;
+      }
+    }
     
     final nuevasSeries = _ctrls.map((c) {
       return SerieDetalle(
@@ -567,11 +601,32 @@ class _EditarDuracionDialogState extends State<_EditarDuracionDialog> {
     super.dispose();
   }
 
+  void _mostrarError(String mensaje) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: const Color(0xFF1A1A1A),
+        content: Text(mensaje,
+            style: const TextStyle(color: Colors.white),
+            textAlign: TextAlign.center),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('OK',
+                style: TextStyle(color: Color(0xFFD32F2F))),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _guardar() {
     final minutos = int.tryParse(_duracionCtrl.text);
-    if (minutos != null && minutos > 0) {
-      widget.onGuardar?.call(minutos);
+    if (minutos == null || minutos <= 0 || minutos > _maxMinutos) {
+      _mostrarError('La duración debe estar entre 1 y $_maxMinutos minutos');
+      return;
     }
+    widget.onGuardar?.call(minutos);
     Navigator.pop(context);
   }
 

@@ -8,6 +8,10 @@ import 'package:mssve/models/rutina_ejercicio.dart';
 import 'package:mssve/widgets/custom_text_field.dart';
 import 'package:mssve/widgets/primary_button.dart';
 
+const _maxReps = 999;
+const _maxMinutos = 999;
+const _maxPeso = 999;
+
 // Bottom sheet para buscar y anadir ejercicios con filtros
 class AddExerciseBottomSheet extends StatefulWidget {
   final int idRutina;
@@ -66,8 +70,43 @@ class _AddExerciseBottomSheetState extends State<AddExerciseBottomSheet> {
     });
   }
 
+  bool _validar() {
+    if (_ejercicioSeleccionado == null) return false;
+
+    if (_ejercicioSeleccionado!.esCardio) {
+      final min = int.tryParse(_duracionCtrl.text);
+      if (min != null && (min < 1 || min > _maxMinutos)) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('La duración debe estar entre 1 y 999 minutos'),
+          backgroundColor: Color(0xFFCF6679),
+        ));
+        return false;
+      }
+    } else {
+      for (final s in _series) {
+        final reps = int.tryParse(s.repsCtr.text) ?? 0;
+        if (reps < 1 || reps > _maxReps) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text('Las repeticiones deben estar entre 1 y $_maxReps'),
+            backgroundColor: Color(0xFFCF6679),
+          ));
+          return false;
+        }
+        final peso = double.tryParse(s.pesoCtr.text);
+        if (peso != null && (peso < 0 || peso > _maxPeso)) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text('El peso debe estar entre 0 y $_maxPeso kg'),
+            backgroundColor: Color(0xFFCF6679),
+          ));
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
   void _confirmar() {
-    if (_ejercicioSeleccionado == null) return;
+    if (!_validar()) return;
 
     if (_ejercicioSeleccionado!.esCardio) {
       context.read<RutinaBloc>().add(RutinaAnadirEjercicioEvent(

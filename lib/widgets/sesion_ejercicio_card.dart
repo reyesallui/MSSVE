@@ -5,6 +5,10 @@ import 'package:mssve/models/rutina_ejercicio.dart';
 import 'package:mssve/models/sesion_ejercicio.dart';
 
 
+const _maxReps = 999;
+const _maxMinutos = 999;
+const _maxPeso = 999;
+
 // Tarjeta de ejercicio en sesion activa con registro de series
 class SesionEjercicioCard extends StatefulWidget {
   final SesionEjercicio sesionEjercicio;
@@ -290,23 +294,21 @@ class _EditarSeriesDialogState extends State<_EditarSeriesDialog> {
   }
 
   
-  void _mostrarErrorReps() {
+  void _mostrarError(String mensaje) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: const Color(0xFF1A1A1A),
         content: Text(
-          'sesion.min_one_rep'.tr(),
+          mensaje,
           style: const TextStyle(color: Colors.white),
           textAlign: TextAlign.center,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text(
-              'common.cancel'.tr(),
-              style: const TextStyle(color: Color(0xFFD32F2F)),
-            ),
+            child: const Text('OK',
+                style: TextStyle(color: Color(0xFFD32F2F))),
           ),
         ],
       ),
@@ -316,21 +318,27 @@ class _EditarSeriesDialogState extends State<_EditarSeriesDialog> {
   
   void _guardar() {
     
-    if (!_esCardio) {
-      final tieneRepsCero = _ctrls.any((c) {
-        final val = int.tryParse(c.repsCtr.text.trim());
-        return val == null || val <= 0;
-      });
-      if (tieneRepsCero) {
-        _mostrarErrorReps();
-        return;
-      }
-    }
-
     if (_esCardio) {
       final minutos = int.tryParse(_minCtrl.text.trim()) ?? 0;
-      widget.onGuardar?.call(const [], minutos > 0 ? minutos : null);
+      if (minutos < 1 || minutos > _maxMinutos) {
+        _mostrarError('La duración debe estar entre 1 y $_maxMinutos minutos');
+        return;
+      }
+      widget.onGuardar?.call(const [], minutos);
     } else {
+      for (final c in _ctrls) {
+        final reps = int.tryParse(c.repsCtr.text.trim());
+        if (reps == null || reps < 1 || reps > _maxReps) {
+          _mostrarError('Las repeticiones deben estar entre 1 y $_maxReps');
+          return;
+        }
+        final peso = double.tryParse(c.pesoCtr.text.trim());
+        if (peso != null && (peso < 0 || peso > _maxPeso)) {
+          _mostrarError('El peso debe estar entre 0 y $_maxPeso kg');
+          return;
+        }
+      }
+
       final series = _ctrls
           .map((c) => SerieDetalle(
                 reps: int.tryParse(c.repsCtr.text.trim()) ?? 0,
