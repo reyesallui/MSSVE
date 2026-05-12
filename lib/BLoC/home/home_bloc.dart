@@ -10,6 +10,7 @@ import '../../../repositories/repository_rutina.dart';
 part 'home_event.dart';
 part 'home_state.dart';
 
+// BloC del home: carga paralela de registro diario, rutinas y perfil del usuario
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
   final RepositoryNutricion _repositoryNutricion;
   final RepositoryRutina _repositoryRutina;
@@ -30,6 +31,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     emit(const HomeLoading());
     try {
       final results = await Future.wait([
+// Carga en paralelo los 3 bloques de datos para la pantalla principal
         _repositoryNutricion.getOCCreateRegistroDiario(idUsuario: event.idUsuario, fecha: event.fecha),
         _repositoryRutina.getRutinas(event.idUsuario),
         _repositoryPerfil.getUsuario(event.idUsuario),

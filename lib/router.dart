@@ -17,7 +17,8 @@ import 'screens/sesion/historial_screen.dart';
 import 'screens/sesion/sesion_screen.dart';
 import 'service_locator.dart';
 
-//Parte del codigo - Configuracion de rutas con GoRouter
+
+// Configuracion centralizada de rutas con GoRouter. Protege rutas segun estado de autenticacion
 class AppRouter {
   AppRouter._();
 
@@ -26,6 +27,8 @@ class AppRouter {
       initialLocation: '/login',
       debugLogDiagnostics: false,
       refreshListenable: GoRouterRefreshStream(authBloc.stream),
+// Refresca el router cuando cambia el estado de autenticacion
+// Redirige al login si no hay sesion, o al home si ya esta autenticado
       redirect: (context, state) {
         final authState = authBloc.state;
         final isAuthPage = state.matchedLocation == '/login' ||
@@ -96,7 +99,8 @@ class AppRouter {
   }
 }
 
-//Parte del codigo - Suscripcion al stream de AuthBloc para refrescar GoRouter
+
+// Convierte un Stream en ChangeNotifier para que GoRouter sepa cuando recalcular rutas
 class GoRouterRefreshStream extends ChangeNotifier {
   GoRouterRefreshStream(Stream<dynamic> stream) {
     _subscription = stream.listen((_) => notifyListeners());

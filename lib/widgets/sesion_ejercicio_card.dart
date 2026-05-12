@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:mssve/models/rutina_ejercicio.dart';
 import 'package:mssve/models/sesion_ejercicio.dart';
 
-// Tarjeta de un ejercicio dentro de la sesión activa
+
+// Tarjeta de ejercicio en sesion activa con registro de series
 class SesionEjercicioCard extends StatefulWidget {
   final SesionEjercicio sesionEjercicio;
   final void Function(List<SerieDetalle> series, int? duracionMinutos)? onGuardar;
@@ -34,7 +35,7 @@ class _SesionEjercicioCardState extends State<SesionEjercicioCard> {
     );
   }
 
-  // /BUILD/
+  
   @override
   Widget build(BuildContext context) {
     final ejercicio    = widget.sesionEjercicio.ejercicio;
@@ -43,7 +44,7 @@ class _SesionEjercicioCardState extends State<SesionEjercicioCard> {
     final series       = widget.sesionEjercicio.seriesRealizadas;
     final tieneDatos   = series.isNotEmpty || widget.sesionEjercicio.duracionMinutos != null;
 
-    //Solo se expande con ejercicio de fuerza que tengan datos.
+    
     return GestureDetector(
       onTap: (!esCardio && tieneDatos)
           ? () => setState(() => _expandido = !_expandido)
@@ -62,7 +63,7 @@ class _SesionEjercicioCardState extends State<SesionEjercicioCard> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
 
-            // /CABECERA/
+            
             Row(children: [
               Container(
                 width: 44, height: 44,
@@ -94,7 +95,7 @@ class _SesionEjercicioCardState extends State<SesionEjercicioCard> {
                   ],
                 ),
               ),
-                 // Solo se muestra la fecha si es un ejercicio de
+                 
               if (!esCardio && tieneDatos)
                 AnimatedRotation(
                   turns: _expandido ? 0.5 : 0,
@@ -123,7 +124,7 @@ class _SesionEjercicioCardState extends State<SesionEjercicioCard> {
                 ),
             ]),
 
-            // /RESUMEN/
+            
             const SizedBox(height: 6),
             if (esCardio) ...[
               Text(
@@ -137,33 +138,65 @@ class _SesionEjercicioCardState extends State<SesionEjercicioCard> {
               Text(_resumenFuerza(series),
                   style: const TextStyle(color: Colors.grey, fontSize: 12)),
 
-            // /DETALLES/
+            
             if (!esCardio && _expandido && tieneDatos) ...[
               const SizedBox(height: 10),
               const Divider(color: Color(0xFF333333), height: 1),
               const SizedBox(height: 8),
               ...List.generate(series.length, (i) {
                 final s = series[i];
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 6),
-                  child: Row(children: [
-                    SizedBox(
-                      width: 20,
-                      child: Text('${i + 1}',
-                          style: const TextStyle(
-                              color: Color(0xFFD32F2F),
-                              fontWeight: FontWeight.bold,
-                              fontSize: 13),
-                          textAlign: TextAlign.center),
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      '${s.reps} reps'
-                      '${s.peso != null ? ' · ${s.peso} kg' : ''}',
-                      style: const TextStyle(
-                          color: Colors.white, fontSize: 13),
-                    ),
-                  ]),
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(children: [
+                      SizedBox(
+                        width: 20,
+                        child: Text('${i + 1}',
+                            style: const TextStyle(
+                                color: Color(0xFFD32F2F),
+                                fontWeight: FontWeight.bold,
+                                fontSize: 13),
+                            textAlign: TextAlign.center),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        '${s.reps} reps'
+                        '${s.peso != null ? ' · ${s.peso} kg' : ''}',
+                        style: const TextStyle(
+                            color: Colors.white, fontSize: 13),
+                      ),
+                      if (s.dropset) ...[
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFD32F2F).withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: const Text('DROP',
+                              style: TextStyle(
+                                  color: Color(0xFFD32F2F),
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold)),
+                        ),
+                      ],
+                    ]),
+                    if (s.dropset && s.dropsets.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(left: 28, top: 2),
+                        child: Row(
+                          children: s.dropsets.asMap().entries.map((e) =>
+                            Padding(
+                              padding: const EdgeInsets.only(right: 8),
+                              child: Text('↓${e.value} kg',
+                                  style: const TextStyle(
+                                      color: Colors.grey, fontSize: 11)),
+                            ),
+                          ).toList(),
+                        ),
+                      ),
+                  ],
                 );
               }),
             ],
@@ -181,7 +214,7 @@ class _SesionEjercicioCardState extends State<SesionEjercicioCard> {
     return 'sesion.no_duration_yet'.tr();
   }
 
-  // Agrupa reps y pesos distintos con / para el texto resumen
+  
   String _resumenFuerza(List<SerieDetalle> series) {
     final n    = series.length;
     final reps = series.map((s) => s.reps).toSet();
@@ -199,8 +232,8 @@ class _SesionEjercicioCardState extends State<SesionEjercicioCard> {
   }
 }
 
-// /DIÁLOGO DE EDICIÓN/
-//Si es cardio se edita la duración, si es fuerza se edita las series enteras y comprobamos que no hay 0 reps
+
+
 class _EditarSeriesDialog extends StatefulWidget {
   final SesionEjercicio sesionEjercicio;
   final void Function(List<SerieDetalle> series, int? duracionMinutos)? onGuardar;
@@ -233,13 +266,15 @@ class _EditarSeriesDialogState extends State<_EditarSeriesDialog> {
       _ctrls = [];
     } else {
       _minCtrl = TextEditingController();
-      // Si no hay series guardadas empezamos con una fila vacía
+      
       final fuente =
           series.isNotEmpty ? series : [const SerieDetalle(reps: 0)];
       _ctrls = fuente
           .map((s) => _SerieCtrl(
                 reps: s.reps > 0 ? s.reps.toString() : '',
                 peso: s.peso?.toString() ?? '',
+                dropset: s.dropset,
+                dropsets: s.dropsets.map((d) => d.toString()).toList(),
               ))
           .toList();
     }
@@ -254,7 +289,7 @@ class _EditarSeriesDialogState extends State<_EditarSeriesDialog> {
     super.dispose();
   }
 
-  // Avisa si alguna serie tiene 0 reps antes de guardar
+  
   void _mostrarErrorReps() {
     showDialog(
       context: context,
@@ -278,9 +313,9 @@ class _EditarSeriesDialogState extends State<_EditarSeriesDialog> {
     );
   }
 
-  // /GUARDAR/
+  
   void _guardar() {
-    //no pueden haber series con 0 repes
+    
     if (!_esCardio) {
       final tieneRepsCero = _ctrls.any((c) {
         final val = int.tryParse(c.repsCtr.text.trim());
@@ -302,6 +337,12 @@ class _EditarSeriesDialogState extends State<_EditarSeriesDialog> {
                 peso: c.pesoCtr.text.isEmpty
                     ? null
                     : double.tryParse(c.pesoCtr.text),
+                dropset: c.dropset,
+                dropsets: c.dropset
+                    ? c.dropsetCtrls
+                        .map((d) => double.tryParse(d.text) ?? 0.0)
+                        .toList()
+                    : [],
               ))
           .toList();
       widget.onGuardar?.call(series, null);
@@ -309,7 +350,7 @@ class _EditarSeriesDialogState extends State<_EditarSeriesDialog> {
     Navigator.pop(context);
   }
 
-  // /BUILD DIÁLOGO/
+  
   @override
   Widget build(BuildContext context) {
     final nombre = widget.sesionEjercicio.ejercicio
@@ -337,7 +378,7 @@ class _EditarSeriesDialogState extends State<_EditarSeriesDialog> {
         width: double.maxFinite,
         child: _esCardio
 
-            // /CARDIO/
+            
             ? TextField(
                 controller: _minCtrl,
                 keyboardType: TextInputType.number,
@@ -355,7 +396,7 @@ class _EditarSeriesDialogState extends State<_EditarSeriesDialog> {
                 ),
               )
 
-            // /FUERZA/
+            
             : SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -374,41 +415,120 @@ class _EditarSeriesDialogState extends State<_EditarSeriesDialog> {
                                 style: TextStyle(
                                     color: Colors.grey, fontSize: 12),
                                 textAlign: TextAlign.center)),
-                        SizedBox(width: 28),
+                        SizedBox(width: 8),
+                        SizedBox(
+                            width: 48,
+                            child: Text('Drop',
+                                style: TextStyle(
+                                    color: Colors.grey, fontSize: 12),
+                                textAlign: TextAlign.center)),
+                        SizedBox(width: 4),
+                        SizedBox(width: 18),
                       ]),
                     ),
                     ...List.generate(_ctrls.length, (i) {
                       final c = _ctrls[i];
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 8),
-                        child: Row(children: [
-                          SizedBox(
-                            width: 20,
-                            child: Text('${i + 1}',
-                                style: const TextStyle(
-                                    color: Color(0xFFD32F2F),
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 13),
-                                textAlign: TextAlign.center),
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(child: _Campo(ctrl: c.repsCtr, hint: '10')),
-                          const SizedBox(width: 8),
-                          Expanded(child: _Campo(ctrl: c.pesoCtr, hint: 'kg')),
-                          const SizedBox(width: 4),
-                          // Mínimo 1 serie — botón quitar solo si hay más de una
-                          if (_ctrls.length > 1)
-                            GestureDetector(
-                              onTap: () => setState(() {
-                                _ctrls[i].dispose();
-                                _ctrls.removeAt(i);
-                              }),
-                              child: const Icon(Icons.remove_circle_outline,
-                                  color: Color(0xFFCF6679), size: 18),
-                            )
-                          else
-                            const SizedBox(width: 18),
-                        ]),
+                      return StatefulBuilder(
+                        builder: (context, setRow) => Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 4),
+                              child: Row(children: [
+                                SizedBox(
+                                  width: 20,
+                                  child: Text('${i + 1}',
+                                      style: const TextStyle(
+                                          color: Color(0xFFD32F2F),
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 13),
+                                      textAlign: TextAlign.center),
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(child: _Campo(ctrl: c.repsCtr, hint: '10')),
+                                const SizedBox(width: 8),
+                                Expanded(child: _Campo(ctrl: c.pesoCtr, hint: 'kg')),
+                                const SizedBox(width: 8),
+                                SizedBox(
+                                  width: 48,
+                                  child: Checkbox(
+                                    value: c.dropset,
+                                    activeColor: const Color(0xFFD32F2F),
+                                    side: const BorderSide(color: Colors.grey),
+                                    onChanged: (v) {
+                                      setRow(() {
+                                        c.dropset = v ?? false;
+                                        if (!c.dropset) {
+                                          for (final d in c.dropsetCtrls) {
+                                            d.dispose();
+                                          }
+                                          c.dropsetCtrls.clear();
+                                        }
+                                      });
+                                    },
+                                  ),
+                                ),
+                                const SizedBox(width: 4),
+                                if (_ctrls.length > 1)
+                                  GestureDetector(
+                                    onTap: () => setState(() {
+                                      _ctrls[i].dispose();
+                                      _ctrls.removeAt(i);
+                                    }),
+                                    child: const Icon(Icons.remove_circle_outline,
+                                        color: Color(0xFFCF6679), size: 18),
+                                  )
+                                else
+                                  const SizedBox(width: 18),
+                              ]),
+                            ),
+                            if (c.dropset) ...[
+                              Padding(
+                                padding: const EdgeInsets.only(left: 28, top: 2, bottom: 4),
+                                child: Row(children: [
+                                  const Icon(Icons.arrow_downward,
+                                      color: Color(0xFFD32F2F), size: 13),
+                                  const SizedBox(width: 4),
+                                  const Text('Dropsets',
+                                      style: TextStyle(
+                                          color: Color(0xFFD32F2F), fontSize: 12)),
+                                  const Spacer(),
+                                  GestureDetector(
+                                    onTap: () => setRow(() =>
+                                        c.dropsetCtrls.add(TextEditingController())),
+                                    child: const Icon(Icons.add_circle_outline,
+                                        color: Color(0xFFD32F2F), size: 18),
+                                  ),
+                                ]),
+                              ),
+                              ...List.generate(c.dropsetCtrls.length, (di) =>
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 28, bottom: 4),
+                                  child: Row(children: [
+                                    Text('Drop ${di + 1}',
+                                        style: const TextStyle(
+                                            color: Colors.grey, fontSize: 12)),
+                                    const SizedBox(width: 8),
+                                    SizedBox(
+                                      width: 80,
+                                      child: _Campo(
+                                          ctrl: c.dropsetCtrls[di], hint: 'kg'),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    GestureDetector(
+                                      onTap: () => setRow(() {
+                                        c.dropsetCtrls[di].dispose();
+                                        c.dropsetCtrls.removeAt(di);
+                                      }),
+                                      child: const Icon(Icons.close,
+                                          color: Colors.grey, size: 14),
+                                    ),
+                                  ]),
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
                       );
                     }),
                     TextButton.icon(
@@ -441,9 +561,9 @@ class _EditarSeriesDialogState extends State<_EditarSeriesDialog> {
   }
 }
 
-// /WIDGETS AUXILIARES/
 
-// Campo numérico compacto reutilizado en reps y peso
+
+
 class _Campo extends StatelessWidget {
   final TextEditingController ctrl;
   final String hint;
@@ -473,17 +593,28 @@ class _Campo extends StatelessWidget {
   }
 }
 
-// Agrupa los controladores de una fila de serie
+
 class _SerieCtrl {
   final TextEditingController repsCtr;
   final TextEditingController pesoCtr;
+  bool dropset;
+  List<TextEditingController> dropsetCtrls;
 
-  _SerieCtrl({String reps = '', String peso = ''})
-      : repsCtr = TextEditingController(text: reps),
-        pesoCtr = TextEditingController(text: peso);
+  _SerieCtrl({
+    String reps = '',
+    String peso = '',
+    this.dropset = false,
+    List<String> dropsets = const [],
+  })  : repsCtr = TextEditingController(text: reps),
+        pesoCtr = TextEditingController(text: peso),
+        dropsetCtrls =
+            dropsets.map((d) => TextEditingController(text: d)).toList();
 
   void dispose() {
     repsCtr.dispose();
     pesoCtr.dispose();
+    for (final d in dropsetCtrls) {
+      d.dispose();
+    }
   }
 }

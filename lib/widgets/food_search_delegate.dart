@@ -5,9 +5,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mssve/BLoC/nutricion/nutricion_bloc.dart';
 import 'package:mssve/models/alimento.dart';
 
-// showSearch() abre una nueva ruta y pierde el contexto del padre.
-// Por eso pasamos el NutricionBloc directamente al delegate en vez de
-// leerlo con context.read() desde dentro del buscador.
+
+
+
+// Delegado de busqueda de alimentos con resultados en tiempo real y creacion rapida
 class FoodSearchDelegate extends SearchDelegate<Alimento?> {
   final int idUsuario;
   final NutricionBloc nutricionBloc;
@@ -52,7 +53,7 @@ class FoodSearchDelegate extends SearchDelegate<Alimento?> {
 
   Widget _buildResultados() {
     return BlocBuilder<NutricionBloc, NutricionState>(
-      bloc: nutricionBloc, // usamos el bloc pasado, no el del contexto
+      bloc: nutricionBloc, 
       builder: (context, state) {
         if (state is! NutricionLoaded) {
           return const Center(child: CircularProgressIndicator());
@@ -73,7 +74,7 @@ class FoodSearchDelegate extends SearchDelegate<Alimento?> {
             return ListTile(
               title: Text(alimento.nombre),
               subtitle: Text(
-                '${alimento.kcalPor100g.toStringAsFixed(0)} kcal/100g · '
+                '${alimento.kcalPor100g.toStringAsFixed(0)} kcal/100g Â· '
                 'P:${alimento.proteinasPor100g.toStringAsFixed(1)}g '
                 'C:${alimento.carbohidratosPor100g.toStringAsFixed(1)}g '
                 'G:${alimento.grasasPor100g.toStringAsFixed(1)}g',

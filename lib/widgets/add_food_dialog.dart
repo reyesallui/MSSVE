@@ -5,9 +5,10 @@ import '../models/alimento.dart';
 import 'custom_text_field.dart';
 import 'primary_button.dart';
 
-// Diálogo que aparece tras seleccionar un alimento en el buscador.
-// El usuario introduce los gramos y el diálogo devuelve la cantidad.
-// Muestra en tiempo real las kcal calculadas según los gramos introducidos
+
+
+
+// Dialogo para anadir alimento a comida con cantidad en gramos
 class AddFoodDialog extends StatefulWidget {
   final Alimento alimento;
 
@@ -25,7 +26,7 @@ class _AddFoodDialogState extends State<AddFoodDialog> {
   @override
   void initState() {
     super.initState();
-    // Calculamos las kcal iniciales con 100g por defecto
+    
     _calcularPreview('100');
     _controller.addListener(() => _calcularPreview(_controller.text));
   }
@@ -85,7 +86,7 @@ class _AddFoodDialogState extends State<AddFoodDialog> {
               ),
               const SizedBox(height: 16),
 
-              // Preview de kcal que se actualiza en tiempo real
+              
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(12),

@@ -1,16 +1,17 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
-// Selector de idioma que cambia el locale de toda la app al instante.
-// easy_localization guarda la preferencia en local y la restaura
-// automáticamente la próxima vez que se abre la app
+
+
+
+// Selector de idioma (es/en/fr) con icono de bandera y persistencia en EasyLocalization
 class LanguageSelector extends StatelessWidget {
   const LanguageSelector({super.key});
 
   static const _idiomas = [
-    {'locale': Locale('es'), 'label': 'Español', 'flag': '🇪🇸'},
-    {'locale': Locale('en'), 'label': 'English', 'flag': '🇬🇧'},
-    {'locale': Locale('fr'), 'label': 'Français', 'flag': '🇫🇷'},
+    {'locale': Locale('es'), 'label': 'Español'},
+    {'locale': Locale('en'), 'label': 'English'},
+    {'locale': Locale('fr'), 'label': 'Français'},
   ];
 
   @override

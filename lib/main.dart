@@ -7,6 +7,7 @@ import 'package:mssve/service_locator.dart';
 import 'package:mssve/services/database_service.dart';
 import 'package:mssve/theme.dart';
 
+// Punto de entrada: inicializa Flutter, traducciones, inyección de dependencias y conexión a BD
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
@@ -22,7 +23,8 @@ void main() async {
   );
 }
 
-//Parte del codigo
+
+// Widget raiz: provee AuthBloc a toda la app y configura MaterialApp.router con tema oscuro y multiidioma
 class MssveApp extends StatelessWidget {
   const MssveApp({super.key});
 

@@ -3,12 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
-// CORREGIDO: import duplicado eliminado, solo uno
+
 import 'package:mssve/BLoC/auth/auth_bloc.dart';
 import '../../utils/get_calculator.dart';
 import '../../widgets/custom_text_field.dart';
 import '../../widgets/primary_button.dart';
 
+// Pantalla de registro multistep con datos personales y fisicos
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
 
@@ -34,8 +35,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // Se llama automáticamente cuando cambia el locale,
-    // forzando el rebuild para actualizar los textos traducidos
+    
+    
     setState(() {});
   }
 

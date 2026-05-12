@@ -1,8 +1,9 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-// Servicio de almacenamiento seguro y persistente en el dispositivo.
-// Guarda el ID y JSON del usuario para mantener la sesión entre arranques
-// sin que el usuario tenga que iniciar sesión cada vez.
+
+
+
+// Almacenamiento seguro con flutter_secure_storage (encriptado en Android con EncryptedSharedPreferences)
 class StorageService {
   final FlutterSecureStorage _storage;
 
@@ -36,13 +37,13 @@ class StorageService {
   Future<void> deleteUserJson() async {
     await _storage.delete(key: _keyUserJson);
   }
-  // La sesión dura indefinidamente hasta que el usuario cierra sesión
-  // manualmente desde el drawer o se desinstala la app
+  
+  
   Future<bool> hasSession() async {
     final userId = await _storage.read(key: _keyUserId);
     return userId != null && userId.isNotEmpty;
   }
-  // Borra todos los datos guardados. Se llama únicamente al hacer logout
+  
   Future<void> clearAll() async {
     await _storage.deleteAll();
   }

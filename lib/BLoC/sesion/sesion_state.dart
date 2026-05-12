@@ -14,9 +14,9 @@ class SesionLoading extends SesionState {
   const SesionLoading();
 }
 
-// Usamos _version para que cada estado emitido sea unico para Equatable.
-// Sin esto, BlocBase.emit() puede descartar estados que parecen iguales
-// aunque sesionActiva o los ejercicios hayan cambiado internamente.
+
+
+
 class SesionLoaded extends SesionState {
   final List<SesionEntrenamiento> historial;
   final SesionEntrenamiento? sesionActiva;
@@ -26,6 +26,7 @@ class SesionLoaded extends SesionState {
     required this.historial,
     this.sesionActiva,
   }) : _version = DateTime.now().microsecondsSinceEpoch;
+// _version fuerza notificacion aunque historial/sesionActiva sean la misma referencia
 
   SesionLoaded copyWith({
     List<SesionEntrenamiento>? historial,
@@ -41,7 +42,7 @@ class SesionLoaded extends SesionState {
   }
 
   @override
-  // _version como unico prop hace que BlocBase.emit() nunca descarte el estado
+  
   List<Object?> get props => [_version];
 }
 

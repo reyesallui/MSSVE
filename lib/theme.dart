@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-//Parte del codigo - Tema oscuro centralizado
+
+// Tema oscuro global con paleta roja (#D32F2F) y tipografia consistente
 class AppTheme {
   AppTheme._();
 

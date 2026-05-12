@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 
+// Modelo de usuario con datos antropometricos, objetivo y gasto energetico total (GET)
 class Usuario extends Equatable {
   final int id;
   final String nombre;
@@ -40,7 +41,7 @@ class Usuario extends Equatable {
       genero: json['genero'] as String,
       objetivo: json['objetivo'] as String,
       nivelActividad: json['nivel_actividad'] as String,
-      // Lee tanto el nombre de la BD como el del JSON cacheado localmente
+      
       gastoEnergeticoTotal: double.parse(
         (json['gasto_energetico_total'] ?? json['get'] ?? 0).toString(),
       ),
@@ -60,10 +61,10 @@ class Usuario extends Equatable {
       'genero': genero,
       'objetivo': objetivo,
       'nivel_actividad': nivelActividad,
-      // CORREGIDO: mismo nombre que la columna en MySQL (sin acento).
-      // El bug era que toJson guardaba 'gasto_energético_total' (con acento)
-      // pero fromJson y la BD usan 'gasto_energetico_total' (sin acento),
-      // así que al leer la caché siempre devolvía 0
+      
+      
+      
+      
       'gasto_energetico_total': gastoEnergeticoTotal,
       'edad': edad,
       'fecha_registro': fechaRegistro.toIso8601String(),

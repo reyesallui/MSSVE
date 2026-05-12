@@ -47,9 +47,9 @@ class AuthLogoutEvent extends AuthEvent {
   const AuthLogoutEvent();
 }
 
-// Actualiza el usuario en AuthBloc sin cerrar sesión.
-// Se usa desde perfil_screen al guardar cambios para que
-// el home refleje inmediatamente los nuevos objetivos de kcal
+
+
+
 class AuthUpdateUserEvent extends AuthEvent {
   final Usuario usuario;
   const AuthUpdateUserEvent(this.usuario);

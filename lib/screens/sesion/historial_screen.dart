@@ -10,6 +10,7 @@ import 'package:mssve/BLoC/rutina/rutina_bloc.dart';
 import 'package:mssve/BLoC/sesion/sesion_bloc.dart';
 import 'package:mssve/widgets/app_drawer.dart';
 
+// Pantalla de historial de sesiones de entrenamiento con progresion
 class HistorialScreen extends StatefulWidget {
   const HistorialScreen({super.key});
 
@@ -127,8 +128,8 @@ class _HistorialScreenState extends State<HistorialScreen> {
   Widget build(BuildContext context) {
     final _ = context.locale;
 
-    // BlocListener detecta cuando sesionActiva pasa de null a tener valor
-    // y navega a /sesion — así evitamos navegar antes de que el bloc procese el evento
+    
+    
     return BlocListener<SesionBloc, SesionState>(
       listenWhen: (prev, curr) {
         if (curr is! SesionLoaded) return false;
@@ -265,8 +266,8 @@ class _HistorialScreenState extends State<HistorialScreen> {
                   return Container(
                     margin: const EdgeInsets.only(bottom: 12),
                     child: ListTile(
-                      // Al pulsar seleccionamos la sesión — el BlocListener
-                      // detecta el cambio y navega a /sesion automáticamente
+                      
+                      
                       onTap: () => context
                           .read<SesionBloc>()
                           .add(SesionSeleccionarEvent(sesion)),
@@ -327,7 +328,7 @@ class _HistorialScreenState extends State<HistorialScreen> {
   }
 }
 
-// Selector de rutina — la fecha viene del historial, sin navegador propio
+
 class _SelectorRutinaSheet extends StatelessWidget {
   final int idUsuario;
   final DateTime fecha;
@@ -400,7 +401,7 @@ class _SelectorRutinaSheet extends StatelessWidget {
                             ejerciciosPlantilla: rutina.ejercicios,
                           ));
                       Navigator.pop(context);
-                      // La navegación la gestiona el BlocListener en HistorialScreen
+                      
                     },
                   );
                 },
@@ -413,7 +414,7 @@ class _SelectorRutinaSheet extends StatelessWidget {
   }
 }
 
-// Gráfico de progresión — dos pasos: lista de ejercicios → gráfico
+
 class _ProgresionSheet extends StatefulWidget {
   final List<SesionEntrenamiento> historial;
   const _ProgresionSheet({required this.historial});

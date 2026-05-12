@@ -4,11 +4,13 @@ import '../models/rutina.dart';
 import '../models/rutina_ejercicio.dart';
 import '../services/database_service.dart';
 
+// Capa de datos de rutinas: CRUD de rutinas y ejercicios con JOINs y JSON para series detalle
 class RepositoryRutina {
   final DatabaseService _db;
 
   RepositoryRutina({required DatabaseService db}) : _db = db;
 
+// Obtiene todas las rutinas del usuario con sus ejercicios y datos anidados via JOIN
   Future<List<Rutina>> getRutinas(int idUsuario) async {
     try {
       final rutinasRows = await _db.query(
@@ -124,6 +126,7 @@ class RepositoryRutina {
     }
   }
 
+// Clona rutina con todos sus ejercicios y detalles de series en JSON
   Future<Rutina> duplicarRutina({
     required Rutina rutina,
     required String nuevoNombre,
@@ -154,6 +157,7 @@ class RepositoryRutina {
     }
   }
 
+// Busqueda en 3 idiomas (nombre_es, nombre_en, nombre_fr) con filtros opcionales
   Future<List<Ejercicio>> buscarEjercicios({
     required String search,
     required int idUsuario,
@@ -161,8 +165,8 @@ class RepositoryRutina {
     String? grupoMuscular,
   }) async {
     try {
-      // Buscamos en los tres idiomas para que la búsqueda funcione
-      // independientemente del idioma activo
+      
+      
       String sql = '''SELECT * FROM ejercicios
           WHERE (nombre_es LIKE ? OR nombre_en LIKE ? OR nombre_fr LIKE ?)
           AND (id_usuario IS NULL OR id_usuario = ?)''';
@@ -198,8 +202,8 @@ class RepositoryRutina {
     String? grupoMuscular,
   }) async {
     try {
-      // Para ejercicios personalizados el usuario solo pone un nombre
-      // lo guardamos en los tres idiomas para mantener la estructura
+      
+      
       final insertId = await _db.insert(
         '''INSERT INTO ejercicios
            (id_usuario, nombre_es, nombre_en, nombre_fr,

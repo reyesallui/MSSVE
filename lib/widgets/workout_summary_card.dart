@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'package:mssve/models/rutina.dart';
 
+// Resumen de rutinas en la pantalla principal con acceso rapido
 class WorkoutSummaryCard extends StatelessWidget {
   final List<Rutina> rutinas;
   final VoidCallback onVerTodas;

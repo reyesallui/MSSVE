@@ -8,7 +8,8 @@ import 'package:mssve/widgets/app_drawer.dart';
 import 'package:mssve/widgets/custom_text_field.dart';
 import 'package:mssve/widgets/primary_button.dart';
 
-// Perfil del usuario — dos pestañas: datos personales y cambio de contraseña
+
+// Pantalla de perfil: edicion de datos personales, cambio de contrasena y seleccion de idioma
 class PerfilScreen extends StatefulWidget {
   const PerfilScreen({super.key});
   @override
@@ -16,7 +17,7 @@ class PerfilScreen extends StatefulWidget {
 }
 
 class _PerfilScreenState extends State<PerfilScreen>
-    // SingleTickerProviderStateMixin requerido por TabController para las animaciones
+    
     with SingleTickerProviderStateMixin {
   late final TabController _tabController;
 
@@ -31,7 +32,7 @@ class _PerfilScreenState extends State<PerfilScreen>
   String _objetivo       = 'Recomposicion';
   String _nivelActividad = 'Moderado';
 
-  // Evita sobreescribir los campos mientras el usuario escribe
+  
   bool _formRellenado = false;
 
   @override
@@ -118,8 +119,8 @@ class _PerfilScreenState extends State<PerfilScreen>
           ],
         ),
       ),
-      // BlocConsumer = BlocBuilder + BlocListener en uno.
-      // buildWhen evita redibujar el formulario durante la carga
+      
+      
       body: BlocConsumer<PerfilBloc, PerfilState>(
         buildWhen: (prev, curr) =>
             curr is! PerfilLoading || prev is PerfilInitial,
@@ -158,7 +159,7 @@ class _PerfilScreenState extends State<PerfilScreen>
     );
   }
 
-  // /PESTAÑA DATOS PERSONALES/
+  
   Widget _buildDatos(PerfilState state) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
@@ -261,8 +262,8 @@ class _PerfilScreenState extends State<PerfilScreen>
     );
   }
 
-  // /PESTAÑA CONTRASEÑA/
-  // Controladores locales al método — no necesitan persistir entre rebuilds
+  
+  
   Widget _buildContrasena() {
     final currentCtrl = TextEditingController();
     final newCtrl     = TextEditingController();
@@ -324,8 +325,8 @@ class _PerfilScreenState extends State<PerfilScreen>
   }
 }
 
-// /DROPDOWN REUTILIZABLE/
-// Usado en género, objetivo y nivel de actividad
+
+
 class _DropdownField extends StatelessWidget {
   final String label;
   final String value;

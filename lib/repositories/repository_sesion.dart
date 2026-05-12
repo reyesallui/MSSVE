@@ -4,16 +4,18 @@ import '../models/sesion_ejercicio.dart';
 import '../models/sesion_entrenamiento.dart';
 import '../services/database_service.dart';
 
-// Gestiona todas las operaciones de BD del diario de entrenamiento.
-// Sigue el mismo patrón que RepositoryRutina — todos los métodos
-// son async y lanzan Exception si algo falla.
+
+
+
+// Capa de datos de sesiones de entrenamiento: historial, CRUD de ejercicios en sesion
 class RepositorySesion {
   final DatabaseService _db;
 
   RepositorySesion({required DatabaseService db}) : _db = db;
 
-  // Carga todo el historial del usuario, del más reciente al más antiguo.
-  // Hace JOIN con rutinas para traer el nombre de la plantilla usada.
+  
+  
+// Obtiene historial de sesiones ordenado por fecha descendente con nombre de rutina
   Future<List<SesionEntrenamiento>> getHistorial(int idUsuario) async {
     try {
       final sesionesRows = await _db.query(
@@ -40,8 +42,9 @@ class RepositorySesion {
     }
   }
 
-  // Busca si ya existe una sesión de esta rutina para el usuario en la fecha dada.
-  // Devuelve la sesión si existe, o null si no hay ninguna.
+  
+  
+// Busca sesion existente para reanudarla; permite entrenar la misma rutina varias veces al dia
   Future<SesionEntrenamiento?> getSesionDelDia({
     required int idRutina,
     required int idUsuario,
@@ -67,8 +70,9 @@ class RepositorySesion {
     }
   }
 
-  // Crea una sesión nueva copiando los ejercicios de la plantilla como punto
-  // de partida. El usuario puede modificar los pesos reales después.
+  
+  
+// Crea sesion desde plantilla de rutina copiando ejercicios y series detalle
   Future<SesionEntrenamiento> crearSesion({
     required int idRutina,
     required int idUsuario,
@@ -82,7 +86,7 @@ class RepositorySesion {
         [idRutina, idUsuario, fecha, notas],
       );
 
-      // Copiamos cada ejercicio de la plantilla con sus series como punto de partida
+      
       for (final re in ejerciciosPlantilla) {
         final seriesJson = re.seriesDetalle.isEmpty
             ? null
@@ -100,7 +104,7 @@ class RepositorySesion {
     }
   }
 
-  // Carga una sesión concreta con todos sus ejercicios
+  
   Future<SesionEntrenamiento> getSesion(int idSesion) async {
     try {
       final rows = await _db.query(
@@ -120,7 +124,7 @@ class RepositorySesion {
     }
   }
 
-  // Guarda los pesos y series reales que el usuario hizo en un ejercicio
+  
   Future<void> modificarEjercicioSesion({
     required int id,
     required List<SerieDetalle> seriesRealizadas,
@@ -140,7 +144,7 @@ class RepositorySesion {
     }
   }
 
-  // Añade un ejercicio extra a la sesión con sus series ya definidas
+  
   Future<SesionEjercicio> anadirEjercicioASesion({
     required int idSesion,
     required int idEjercicio,
@@ -161,7 +165,7 @@ class RepositorySesion {
     }
   }
 
-  // Elimina un ejercicio de la sesión
+  
   Future<void> eliminarEjercicioDeSesion(int id) async {
     try {
       await _db.query('DELETE FROM sesion_ejercicio WHERE id = ?', [id]);
@@ -170,7 +174,7 @@ class RepositorySesion {
     }
   }
 
-  // Elimina una sesión completa — los ejercicios se borran en cascada por la FK
+  
   Future<void> eliminarSesion(int id) async {
     try {
       await _db.query(
@@ -180,8 +184,8 @@ class RepositorySesion {
     }
   }
 
-  // Carga los ejercicios de una sesión con JOIN para traer los datos del ejercicio.
-  // Devuelve una lista de Maps que luego SesionEjercicio.fromJson convierte a objetos.
+  
+  
   Future<List<Map<String, dynamic>>> _cargarEjerciciosDeSesion(
       int idSesion) async {
     final rows = await _db.query(
@@ -201,7 +205,7 @@ class RepositorySesion {
       [idSesion],
     );
 
-    // Construimos el Map anidado que espera SesionEjercicio.fromJson
+    
     return rows.map((row) => {
       'id':                row['id'],
       'id_sesion':         row['id_sesion'],

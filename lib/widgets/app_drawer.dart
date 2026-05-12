@@ -7,8 +7,9 @@ import 'package:mssve/BLoC/auth/auth_bloc.dart';
 import 'package:mssve/models/usuario.dart';
 import 'package:mssve/widgets/language_selector.dart';
 
-// Drawer lateral de la app con todos los accesos de navegación.
-// Es StatefulWidget para reconstruirse automáticamente al cambiar el idioma.
+
+
+// Menu lateral de navegacion principal
 class AppDrawer extends StatefulWidget {
   final Usuario usuario;
   const AppDrawer({super.key, required this.usuario});
@@ -21,7 +22,7 @@ class _AppDrawerState extends State<AppDrawer> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // Fuerza el rebuild cuando cambia el locale
+    
     setState(() {});
   }
 
@@ -77,7 +78,7 @@ class _AppDrawerState extends State<AppDrawer> {
               context.go('/rutina');
             },
           ),
-          // Nuevo apartado — acceso al diario de entrenamiento
+          
           _DrawerItem(
             icon: Icons.menu_book_outlined,
             label: 'drawer.training_diary'.tr(),
@@ -125,7 +126,7 @@ class _AppDrawerState extends State<AppDrawer> {
   }
 }
 
-// Fila del drawer reutilizable con icono, texto y acción al pulsar
+
 class _DrawerItem extends StatelessWidget {
   final IconData icon;
   final String label;

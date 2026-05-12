@@ -1,7 +1,8 @@
-// Es el entrenamiento del Usuario contiene la lista de ejercicios con los pesos y series
+
 import 'package:equatable/equatable.dart';
 import 'rutina_ejercicio.dart';
 
+// Modelo de rutina de entrenamiento con nombre, fecha, notas y lista de ejercicios
 class Rutina extends Equatable{
 
   final int id;

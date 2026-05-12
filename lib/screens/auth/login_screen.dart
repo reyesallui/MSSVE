@@ -7,10 +7,11 @@ import '../../widgets/custom_text_field.dart';
 import '../../widgets/language_selector.dart';
 import '../../widgets/primary_button.dart';
 
-// Pantalla de inicio de sesión.
-// Muestra el logo, los campos de email y contraseña,
-// y el botón de login. También permite cambiar el idioma
-// desde el selector del AppBar.
+
+
+
+
+// Pantalla de inicio de sesion con formulario y validacion
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -19,7 +20,7 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  // _formKey nos permite validar todos los campos del formulario a la vez
+  
   final _formKey = GlobalKey<FormState>();
   final _emailCtrl = TextEditingController();
   final _passwordCtrl = TextEditingController();
@@ -28,21 +29,21 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // Se llama automáticamente cuando cambia el locale,
-    // forzando el rebuild para actualizar los textos traducidos
+    
+    
     setState(() {});
   }
 
   @override
   void dispose() {
-    // Liberamos los controladores al salir de la pantalla
-    // para evitar fugas de memoria
+    
+    
     _emailCtrl.dispose();
     _passwordCtrl.dispose();
     super.dispose();
   }
 
-  // Valida el formulario y manda el evento de login al AuthBloc
+  
   void _login() {
     if (!_formKey.currentState!.validate()) return;
     context.read<AuthBloc>().add(AuthLoginEvent(
@@ -53,8 +54,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Leer context.locale registra este widget como dependiente
-    // de EasyLocalization, lo que dispara el rebuild al cambiar idioma
+    
+    
     final _ = context.locale;
 
     return Scaffold(
@@ -62,12 +63,12 @@ class _LoginScreenState extends State<LoginScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        // Selector de idioma en la esquina superior derecha
+        
         actions: const [LanguageSelector(), SizedBox(width: 8)],
       ),
-      // BlocListener escucha los cambios del AuthBloc sin reconstruir la UI.
-      // Solo reacciona a eventos concretos: navega al home si el login
-      // fue bien, o muestra un snackbar si hubo un error.
+      
+      
+      
       body: BlocListener<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is AuthSuccess) {
@@ -87,7 +88,7 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Logo de la app — si no existe el archivo muestra el nombre
+                  
                   Image.asset(
                     'assets/logo/logo.png',
                     height: 300,
@@ -119,7 +120,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     label: 'login.password'.tr(),
                     obscureText: _obscurePassword,
                     prefixIcon: const Icon(Icons.lock_outline, color: Colors.grey),
-                    // Icono para mostrar u ocultar la contraseña
+                    
                     suffixIcon: IconButton(
                       icon: Icon(
                         _obscurePassword
@@ -136,8 +137,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     },
                   ),
                   const SizedBox(height: 32),
-                  // BlocBuilder reconstruye solo el botón para mostrar
-                  // el spinner de carga mientras se procesa el login
+                  
+                  
                   BlocBuilder<AuthBloc, AuthState>(
                     builder: (context, state) => PrimaryButton(
                       label: 'login.button'.tr(),

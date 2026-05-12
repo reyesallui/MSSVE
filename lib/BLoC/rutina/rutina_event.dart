@@ -142,7 +142,7 @@ class RutinaAnadirEjercicioEvent extends RutinaEvent {
   List<Object?> get props => [idRutina, idEjercicio];
 }
 
-// ── MODIFICADO: añadido seriesDetalle ──────────────────────────
+
 class RutinaModificarEjercicioEvent extends RutinaEvent {
   final int id;
   final int idUsuario;

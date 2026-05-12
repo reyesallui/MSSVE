@@ -2,8 +2,8 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 import 'package:mssve/BLoC/auth/auth_bloc.dart';
+import 'package:intl/intl.dart';
 
 import 'package:mssve/models/rutina.dart';
 import 'package:mssve/BLoC/rutina/rutina_bloc.dart';
@@ -11,7 +11,8 @@ import 'package:mssve/widgets/add_exercise_bottom_sheet.dart';
 import 'package:mssve/widgets/app_drawer.dart';
 import 'package:mssve/widgets/exercise_card.dart';
 
-// Pantalla de rutinas — lista las rutinas del usuario y al pulsar una muestra su detalle
+
+// Pantalla de rutinas: CRUD de rutinas con ejercicios y series detalle
 class RutinaScreen extends StatefulWidget {
   const RutinaScreen({super.key});
 
@@ -30,7 +31,7 @@ class _RutinaScreenState extends State<RutinaScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // Fuerza rebuild al cambiar idioma
+    
     setState(() {});
   }
 
@@ -41,7 +42,7 @@ class _RutinaScreenState extends State<RutinaScreen> {
     }
   }
 
-  // /CREAR RUTINA/
+  
   Future<void> _mostrarCrearRutina() async {
     final authState = context.read<AuthBloc>().state;
     if (authState is! AuthSuccess) return;
@@ -97,9 +98,9 @@ class _RutinaScreenState extends State<RutinaScreen> {
     );
   }
 
-  // /CREAR EJERCICIO PERSONALIZADO/
-  // StatefulBuilder permite hacer setState dentro del AlertDialog
-  // sin tener que convertirlo en un widget propio
+  
+  
+  
   Future<void> _mostrarCrearEjercicio(
       BuildContext context, int idUsuario) async {
     final nombreCtrl = TextEditingController();
@@ -139,7 +140,7 @@ class _RutinaScreenState extends State<RutinaScreen> {
                   onChanged: (v) => setStateDialog(() => esCardio = v),
                 ),
               ]),
-              // El grupo muscular solo aparece si NO es cardio
+              
               if (!esCardio) ...[
                 const SizedBox(height: 8),
                 DropdownButtonFormField<String>(
@@ -192,7 +193,7 @@ class _RutinaScreenState extends State<RutinaScreen> {
     );
   }
 
-  // /CONFIRMAR ELIMINAR/
+  
   void _confirmarEliminar(BuildContext context, Rutina rutina) {
     final authState = context.read<AuthBloc>().state;
     if (authState is! AuthSuccess) return;
@@ -224,7 +225,7 @@ class _RutinaScreenState extends State<RutinaScreen> {
     );
   }
 
-  // /BUILD/
+  
   @override
   Widget build(BuildContext context) {
     final _ = context.locale;
@@ -248,13 +249,13 @@ class _RutinaScreenState extends State<RutinaScreen> {
             tooltip: 'drawer.home'.tr(),
             onPressed: () => context.go('/home'),
           ),
-          // Botón de crear ejercicio — solo visible cuando hay rutina activa
+          
           BlocBuilder<RutinaBloc, RutinaState>(
             builder: (context, state) {
               if (state is! RutinaLoaded || state.rutinaActiva == null) {
                 return const SizedBox();
               }
-              // Cast explícito necesario porque Dart solo sabe que es AuthState
+              
               final idUsuario =
                   context.read<AuthBloc>().state is AuthSuccess
                       ? (context.read<AuthBloc>().state as AuthSuccess)
@@ -272,8 +273,8 @@ class _RutinaScreenState extends State<RutinaScreen> {
           ),
         ],
       ),
-      // FAB: añade ejercicio si hay rutina activa, crea rutina si no hay ninguna
-      // _mostrarCrearRutina sin () = referencia a la función, no llamada inmediata
+      
+      
       floatingActionButton: BlocBuilder<RutinaBloc, RutinaState>(
         builder: (context, state) {
           final rutinaActiva =
@@ -290,8 +291,8 @@ class _RutinaScreenState extends State<RutinaScreen> {
                       context: context,
                       isScrollControlled: true,
                       backgroundColor: Colors.transparent,
-                      // BlocProvider.value pasa el bloc existente al sheet
-                      // sin crear una instancia nueva
+                      
+                      
                       builder: (_) => BlocProvider.value(
                         value: context.read<RutinaBloc>(),
                         child: AddExerciseBottomSheet(
@@ -306,7 +307,7 @@ class _RutinaScreenState extends State<RutinaScreen> {
         },
       ),
 
-      // /BODY/
+      
       body: BlocBuilder<RutinaBloc, RutinaState>(
         builder: (context, state) {
           if (state is RutinaLoading || state is RutinaInitial) {
@@ -348,14 +349,14 @@ class _RutinaScreenState extends State<RutinaScreen> {
   }
 }
 
-// /DETALLE DE RUTINA/
-// Muestra la cabecera con el nombre y la lista de ejercicios con ExerciseCard.
-// Es lo que aparece al pulsar una rutina de la lista.
+
+
+
 class _DetalleRutina extends StatelessWidget {
   final Rutina rutina;
   const _DetalleRutina({required this.rutina});
 
-  // Static porque StatelessWidget no puede tener métodos de instancia con contexto
+  
   static Future<void> _mostrarCrearEjercicioDetalle(
       BuildContext context, int idUsuario) async {
     final nombreCtrl = TextEditingController();
@@ -463,7 +464,7 @@ class _DetalleRutina extends StatelessWidget {
         child: Row(children: [
           IconButton(
             icon: const Icon(Icons.arrow_back, color: Colors.white),
-            // Recargar rutinas deselecciona la activa automáticamente
+            
             onPressed: () => context
                 .read<RutinaBloc>()
                 .add(RutinaLoadEvent(idUsuario)),
@@ -508,6 +509,16 @@ class _DetalleRutina extends StatelessWidget {
                             ),
                           );
                     },
+                    onGuardarDuracion: (minutos) {
+                      context.read<RutinaBloc>().add(
+                            RutinaModificarEjercicioEvent(
+                              id: re.id,
+                              idUsuario: idUsuario,
+                              duracionMinutos: minutos,
+                              seriesDetalle: const [],
+                            ),
+                          );
+                    },
                   );
                 },
               ),
@@ -516,8 +527,8 @@ class _DetalleRutina extends StatelessWidget {
   }
 }
 
-// /ITEM DE RUTINA/
-// Fila de la lista principal — al pulsar navega al detalle
+
+
 class _RutinaItem extends StatelessWidget {
   final Rutina rutina;
   final VoidCallback onTap;

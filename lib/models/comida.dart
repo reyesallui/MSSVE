@@ -1,9 +1,10 @@
-//Representa una comida del dia
+
 
 import 'package:equatable/equatable.dart';
 
 import 'comida_alimento.dart';
 
+// Modelo de comida (Desayuno, Almuerzo, etc.) con lista de alimentos y totales calculados
 class Comida extends Equatable{
 
   final int id;
@@ -34,14 +35,16 @@ class Comida extends Equatable{
     );
   }
 
-  //Suma de todas las Kcal consumidas en una unica comida
+  
   double get totalKcal => 
+// Suma de kcal de todos los alimentos de la comida
   alimentos.fold(0.0,(sum,a)=>sum +a.kcalCalculadas);
 
 
 
-  //SUma de todos los macros consumidos en una unica comida
+  
 
+// Suma de macros (proteinas, carbohidratos, grasas) de todos los alimentos
   Map<String, double>get totalMacros{
     double proteinas = 0;
     double carbohidratos =0;

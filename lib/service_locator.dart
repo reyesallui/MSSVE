@@ -16,8 +16,10 @@ import 'services/database_service.dart';
 import 'services/storage_service.dart';
 
 final GetIt sl = GetIt.instance;
+// Contenedor de inyección de dependencias (singletons y factories)
 
-//Parte del codigo - Registro de dependencias (inyeccion de dependencias)
+
+// Registra servicios como singletons globales y BLoCs como factories (nueva instancia por pantalla)
 Future<void> setupServiceLocator() async {
   sl.registerLazySingleton<StorageService>(() => StorageService());
   sl.registerSingleton<DatabaseService>(DatabaseService());

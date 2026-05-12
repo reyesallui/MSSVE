@@ -15,10 +15,10 @@ class RutinaLoading extends RutinaState {
   const RutinaLoading();
 }
 
-// Estado principal con la lista de rutinas, la rutina seleccionada
-// y los resultados del buscador de ejercicios.
-// clearRutinaActiva existe porque copyWith no puede pasar null
-// a un campo nullable: el ?? lo ignoraría, necesitamos un flag explícito
+
+
+
+
 class RutinaLoaded extends RutinaState {
   final List<Rutina> rutinas;
   final Rutina? rutinaActiva;

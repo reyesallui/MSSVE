@@ -1,9 +1,10 @@
-//Registra la nutricion de un usuario para una fecha concreta tiene todas las comidas y alimentos
+
 
 import 'package:equatable/equatable.dart';
 
 import 'comida.dart';
 
+// Modelo del registro diario: fecha, kcal totales, lista de comidas y macros acumulados
 class RegistroDiario extends Equatable{
   final int id; 
   final int idUsuario;
@@ -35,13 +36,15 @@ class RegistroDiario extends Equatable{
     );
   }
 
-  //Suma las kcal de todas las comidas del dia lo usamos en CalorieProgressCard
+  
 
   double get kcalConsumidas =>
+// Calcula kcal totales consumidas en el dia sumando todas las comidas
   comidas.fold(0.0, (sum, c) => sum + c.totalKcal);
 
-  //suma los macros y los usamos en MacroProgressCard
+  
 
+// Agrega macros de todas las comidas del dia
   Map<String, double> get macrosTotales{
     double proteinas = 0;
     double carbohidratos = 0;

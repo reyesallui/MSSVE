@@ -3,15 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:mssve/models/rutina_ejercicio.dart';
 
 
-// Tarjeta  que muestra un ejercicio de la rutina.
-// Es un StatefulWidget porque tiene estado propio si está expandida o no.
+
+
+// Tarjeta de ejercicio con datos de series, peso y dropsets
 class ExerciseCard extends StatefulWidget {
   final RutinaEjercicio rutinaEjercicio;
   final VoidCallback? onEditar;
   final VoidCallback? onEliminar;
-  // Callback que devuelve la lista de series modificadas para
-  // que el BLoC pueda guardarlas en la BD
+  
+  
   final void Function(List<SerieDetalle>)? onGuardarDetalle;
+  final void Function(int)? onGuardarDuracion;
 
   const ExerciseCard({
     super.key,
@@ -19,6 +21,7 @@ class ExerciseCard extends StatefulWidget {
     this.onEditar,
     this.onEliminar,
     this.onGuardarDetalle,
+    this.onGuardarDuracion,
   });
 
   @override
@@ -26,19 +29,29 @@ class ExerciseCard extends StatefulWidget {
 }
 
 
-// Estado de ExerciseCard. Aquí vive la lógica de expandir/contraer la tarjeta.
+
 class _ExerciseCardState extends State<ExerciseCard> {
   bool _expandido = false;
 
-  // Abre el diálogo de edición con todos los detalles del ejercicio
+  
   void _abrirEdicion(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (_) => _EditarDetalleDialog(
-        rutinaEjercicio: widget.rutinaEjercicio,
-        onGuardar: widget.onGuardarDetalle,
-      ),
-    );
+    if (widget.rutinaEjercicio.ejercicio.esCardio) {
+      showDialog(
+        context: context,
+        builder: (_) => _EditarDuracionDialog(
+          rutinaEjercicio: widget.rutinaEjercicio,
+          onGuardar: widget.onGuardarDuracion,
+        ),
+      );
+    } else {
+      showDialog(
+        context: context,
+        builder: (_) => _EditarDetalleDialog(
+          rutinaEjercicio: widget.rutinaEjercicio,
+          onGuardar: widget.onGuardarDetalle,
+        ),
+      );
+    }
   }
 
   @override
@@ -47,19 +60,21 @@ class _ExerciseCardState extends State<ExerciseCard> {
     final esCardio     = ejercicio.esCardio;
     final nombre       = ejercicio.nombrePara(context.locale.languageCode);
     final detalle      = widget.rutinaEjercicio.seriesDetalle;
-    // Solo mostramos el detalle si es fuerza Y tiene series guardadas
+    
     final tieneDetalle = !esCardio && detalle.isNotEmpty;
 
     return GestureDetector(
-      // Solo es clickable si tiene detalle que mostrar
-      onTap: tieneDetalle ? () => setState(() => _expandido = !_expandido) : null,
+      
+      onTap: (!esCardio && tieneDetalle)
+          ? () => setState(() => _expandido = !_expandido)
+          : (esCardio ? () => _abrirEdicion(context) : null),
       child: Container(
         margin: const EdgeInsets.only(bottom: 8),
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
           color: const Color(0xFF1A1A1A),
           borderRadius: BorderRadius.circular(12),
-          // El borde rojo solo aparece cuando la tarjeta está expandida
+          
           border: _expandido
               ? Border.all(color: const Color(0xFFD32F2F).withOpacity(0.4))
               : null,
@@ -68,7 +83,7 @@ class _ExerciseCardState extends State<ExerciseCard> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
 
-            //CABECERA 
+            
             Row(children: [
               Container(
                 width: 44, height: 44,
@@ -76,7 +91,7 @@ class _ExerciseCardState extends State<ExerciseCard> {
                   color: const Color(0xFFD32F2F).withOpacity(0.15),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                // Icono diferente según si es cardio o fuerza
+                
                 child: Icon(
                   esCardio
                       ? Icons.directions_run_outlined
@@ -101,8 +116,8 @@ class _ExerciseCardState extends State<ExerciseCard> {
                   ],
                 ),
               ),
-              // AnimatedRotation gira la flecha 180° cuando se expande.
-              // turns: 0.5 equivale a media vuelta (180°)
+              
+              
               if (tieneDetalle)
                 AnimatedRotation(
                   turns: _expandido ? 0.5 : 0,
@@ -110,12 +125,12 @@ class _ExerciseCardState extends State<ExerciseCard> {
                   child: const Icon(Icons.keyboard_arrow_down,
                       color: Colors.grey, size: 20),
                 ),
-              if (tieneDetalle) ...[
+              if (tieneDetalle || esCardio) ...[
                 const SizedBox(width: 4),
                 IconButton(
                   icon: const Icon(Icons.edit_outlined,
                       color: Color(0xFFD32F2F), size: 18),
-                  tooltip: 'Editar series',
+                  tooltip: esCardio ? 'Editar duración' : 'Editar series',
                   onPressed: () => _abrirEdicion(context),
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
@@ -133,11 +148,14 @@ class _ExerciseCardState extends State<ExerciseCard> {
               ],
             ]),
 
-            //RESUMEN 
+            
             const SizedBox(height: 6),
             if (esCardio && widget.rutinaEjercicio.duracionMinutos != null)
               Text('${widget.rutinaEjercicio.duracionMinutos} min',
                   style: const TextStyle(color: Colors.grey, fontSize: 12))
+            else if (esCardio)
+              Text('Toca para añadir duración',
+                  style: const TextStyle(color: Color(0xFF555555), fontSize: 12))
             else if (tieneDetalle)
               Text(_resumenSeries(detalle),
                   style: const TextStyle(color: Colors.grey, fontSize: 12))
@@ -145,12 +163,12 @@ class _ExerciseCardState extends State<ExerciseCard> {
               Text(_labelFuerza(),
                   style: const TextStyle(color: Colors.grey, fontSize: 12)),
 
-            //DETALLE EXPANDIDO 
+            
             if (_expandido && tieneDetalle) ...[
               const SizedBox(height: 10),
               const Divider(color: Color(0xFF333333), height: 1),
               const SizedBox(height: 8),
-              // List.generate es como un for loop que devuelve widgets
+              
               ...List.generate(detalle.length, (i) {
                 final serie = detalle[i];
                 return Column(
@@ -172,8 +190,8 @@ class _ExerciseCardState extends State<ExerciseCard> {
                         '${serie.peso != null ? ' · ${serie.peso} kg' : ''}',
                         style: const TextStyle(color: Colors.white, fontSize: 13),
                       ),
-                      // Badge "DROP" que solo aparece si la serie tiene dropset
-                      if (serie.dropset) ... //los ... es un objeto que permite recorrer secuencialmente una colección de elementos como una lista,
+                      
+                      if (serie.dropset) ... 
                       [
                         const SizedBox(width: 8),
                         Container(
@@ -191,12 +209,12 @@ class _ExerciseCardState extends State<ExerciseCard> {
                         ),
                       ],
                     ]),
-                    // Si tiene dropsets, los mostramos en una fila debajo
+                    
                     if (serie.dropset && serie.dropsets.isNotEmpty)
                       Padding(
                         padding: const EdgeInsets.only(left: 28, top: 2),
                         child: Row(
-                          // .asMap().entries nos da el índice y el valor a la vez
+                          
                           children: serie.dropsets.asMap().entries.map((e) =>
                             Padding(
                               padding: const EdgeInsets.only(right: 8),
@@ -219,13 +237,13 @@ class _ExerciseCardState extends State<ExerciseCard> {
     );
   }
 
-  // Genera un texto resumen como "3 series · 10/8/6 reps · 50/45 kg".
-  // Usa Set para detectar si todos los valores son iguales o varían entre series.
+  
+  
   String _resumenSeries(List<SerieDetalle> detalle) {
     final numSeries = detalle.length;
     final pesos = detalle.where((s) => s.peso != null).map((s) => s.peso!).toSet();
     final reps  = detalle.map((s) => s.reps).toSet();
-    //Cambiar series para traducirlo
+    
     final partes = <String>['$numSeries series'];
     if (reps.length == 1) {
       partes.add('${reps.first} reps');
@@ -242,11 +260,11 @@ class _ExerciseCardState extends State<ExerciseCard> {
     return partes.join(' · ');
   }
 
-  // Genera el texto de resumen cuando no hay series detalladas guardadas todavía.
-  // Solo muestra los campos que no sean null.
+  
+  
   String _labelFuerza() {
     final partes = <String>[];
-    //Cambiar el texto para traducirlo
+    
     if (widget.rutinaEjercicio.series != null) {
       partes.add('${widget.rutinaEjercicio.series} series');
     }
@@ -261,8 +279,8 @@ class _ExerciseCardState extends State<ExerciseCard> {
 }
 
 
-// Diálogo para editar las series de un ejercicio.
-// Es StatefulWidget porque gestiona los controladores de texto de cada serie.
+
+
 class _EditarDetalleDialog extends StatefulWidget {
   final RutinaEjercicio rutinaEjercicio;
   final void Function(List<SerieDetalle>)? onGuardar;
@@ -283,11 +301,12 @@ class _EditarDetalleDialogState extends State<_EditarDetalleDialog> {
   @override
   void initState() {
     super.initState();
-    // Creamos un controlador por cada serie existente, precargando sus valores
+    
     _ctrls = widget.rutinaEjercicio.seriesDetalle.map((s) {
       return _SerieEditCtrl(
         reps: s.reps.toString(),
-        peso: s.peso?.toString() ?? '',
+        peso: s.peso?.toString() ??
+            widget.rutinaEjercicio.pesoKg?.toString() ?? '',
         dropset: s.dropset,
         dropsets: s.dropsets.map((d) => d.toString()).toList(),
       );
@@ -296,7 +315,7 @@ class _EditarDetalleDialogState extends State<_EditarDetalleDialog> {
 
   @override
   void dispose() {
-    // Importante: liberar todos los TextEditingController para evitar memory leaks
+    
     for (final c in _ctrls) {
       c.dispose();
     }
@@ -304,8 +323,8 @@ class _EditarDetalleDialogState extends State<_EditarDetalleDialog> {
   }
 
   void _guardar() {
-    // Convertimos los textos de los campos a los tipos correctos (int, double)
-    // int.tryParse devuelve null si el texto no es un número, por eso usamos ??
+    
+    
     final nuevasSeries = _ctrls.map((c) {
       return SerieDetalle(
         reps: int.tryParse(c.repsCtr.text) ?? 0,
@@ -348,7 +367,7 @@ class _EditarDetalleDialogState extends State<_EditarDetalleDialog> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Cabecera de columnas
+              
               const Padding(
                 padding: EdgeInsets.only(left: 28, bottom: 6),
                 child: Row(children: [
@@ -364,14 +383,16 @@ class _EditarDetalleDialogState extends State<_EditarDetalleDialog> {
                       child: Text('Drop',
                           style: TextStyle(color: Colors.grey, fontSize: 12),
                           textAlign: TextAlign.center)),
+                  SizedBox(width: 4),
+                  SizedBox(width: 18),
                 ]),
               ),
 
-              // Fila por cada serie
+              
               ...List.generate(_ctrls.length, (i) {
                 final ctrl = _ctrls[i];
-                // StatefulBuilder nos permite hacer setState solo en esta fila
-                // sin reconstruir todo el diálogo por lo que lo usamos para las casillas de dropset
+                
+                
                 return StatefulBuilder(
                   builder: (context, setRow) => Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -400,7 +421,7 @@ class _EditarDetalleDialogState extends State<_EditarDetalleDialog> {
                             onChanged: (v) {
                               setRow(() {
                                 ctrl.dropset = v ?? false;
-                                // Si desmarcamos, limpiamos y liberamos los controladores de dropsets
+                                
                                 if (!ctrl.dropset) {
                                   for (final d in ctrl.dropsetCtrls) {
                                     d.dispose();
@@ -411,9 +432,21 @@ class _EditarDetalleDialogState extends State<_EditarDetalleDialog> {
                             },
                           ),
                         ),
+                        const SizedBox(width: 4),
+                        if (_ctrls.length > 1)
+                          GestureDetector(
+                            onTap: () => setState(() {
+                              _ctrls[i].dispose();
+                              _ctrls.removeAt(i);
+                            }),
+                            child: const Icon(Icons.remove_circle_outline,
+                                color: Color(0xFFCF6679), size: 18),
+                          )
+                        else
+                          const SizedBox(width: 18),
                       ]),
 
-                      // Sección de dropsets, solo visible si el checkbox está marcado
+                      
                       if (ctrl.dropset) ...[
                         Padding(
                           padding: const EdgeInsets.only(left: 28, top: 6, bottom: 4),
@@ -425,7 +458,7 @@ class _EditarDetalleDialogState extends State<_EditarDetalleDialog> {
                                 style: TextStyle(
                                     color: Color(0xFFD32F2F), fontSize: 12)),
                             const Spacer(),
-                            // Botón para añadir un dropset nuevo
+                            
                             GestureDetector(
                               onTap: () => setRow(() =>
                                   ctrl.dropsetCtrls.add(TextEditingController())),
@@ -448,7 +481,7 @@ class _EditarDetalleDialogState extends State<_EditarDetalleDialog> {
                                     ctrl: ctrl.dropsetCtrls[di], hint: 'kg'),
                               ),
                               const SizedBox(width: 8),
-                              // Elimina este dropset y libera su controlador
+                              
                               GestureDetector(
                                 onTap: () => setRow(() {
                                   ctrl.dropsetCtrls[di].dispose();
@@ -467,6 +500,20 @@ class _EditarDetalleDialogState extends State<_EditarDetalleDialog> {
                   ),
                 );
               }),
+              TextButton.icon(
+                onPressed: () =>
+                    setState(() => _ctrls.add(_SerieEditCtrl(
+                      reps: '',
+                      peso: widget.rutinaEjercicio.pesoKg?.toString() ?? '',
+                      dropset: false,
+                      dropsets: const [],
+                    ))),
+                icon: const Icon(Icons.add_circle_outline,
+                    color: Color(0xFFD32F2F), size: 16),
+                label: const Text('Añadir serie',
+                    style: TextStyle(
+                        color: Color(0xFFD32F2F), fontSize: 13)),
+              ),
             ],
           ),
         ),
@@ -489,7 +536,89 @@ class _EditarDetalleDialogState extends State<_EditarDetalleDialog> {
 }
 
 
-// Campo de texto
+
+class _EditarDuracionDialog extends StatefulWidget {
+  final RutinaEjercicio rutinaEjercicio;
+  final void Function(int)? onGuardar;
+
+  const _EditarDuracionDialog({
+    required this.rutinaEjercicio,
+    this.onGuardar,
+  });
+
+  @override
+  State<_EditarDuracionDialog> createState() => _EditarDuracionDialogState();
+}
+
+class _EditarDuracionDialogState extends State<_EditarDuracionDialog> {
+  late TextEditingController _duracionCtrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _duracionCtrl = TextEditingController(
+      text: widget.rutinaEjercicio.duracionMinutos?.toString() ?? '',
+    );
+  }
+
+  @override
+  void dispose() {
+    _duracionCtrl.dispose();
+    super.dispose();
+  }
+
+  void _guardar() {
+    final minutos = int.tryParse(_duracionCtrl.text);
+    if (minutos != null && minutos > 0) {
+      widget.onGuardar?.call(minutos);
+    }
+    Navigator.pop(context);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final nombre = widget.rutinaEjercicio.ejercicio
+        .nombrePara(context.locale.languageCode);
+
+    return AlertDialog(
+      backgroundColor: const Color(0xFF1A1A1A),
+      title: Text(nombre,
+          style: const TextStyle(
+              color: Color(0xFFD32F2F),
+              fontWeight: FontWeight.bold,
+              fontSize: 16)),
+      content: TextField(
+        controller: _duracionCtrl,
+        keyboardType: TextInputType.number,
+        style: const TextStyle(color: Colors.white),
+        decoration: const InputDecoration(
+          labelText: 'Duración (minutos)',
+          labelStyle: TextStyle(color: Colors.grey),
+          enabledBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: Color(0xFF333333))),
+          focusedBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: Color(0xFFD32F2F))),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cancelar',
+              style: TextStyle(color: Colors.grey)),
+        ),
+        TextButton(
+          onPressed: _guardar,
+          child: const Text('Guardar',
+              style: TextStyle(
+                  color: Color(0xFFD32F2F),
+                  fontWeight: FontWeight.bold)),
+        ),
+      ],
+    );
+  }
+}
+
+
 class _CampoEdicion extends StatelessWidget {
   final TextEditingController ctrl;
   final String hint;
@@ -519,8 +648,8 @@ class _CampoEdicion extends StatelessWidget {
 }
 
 
-// Clase auxiliar que agrupa los TextEditingController de una sola serie.
-// Centraliza la creación y el dispose de todos los controladores de una fila.
+
+
 class _SerieEditCtrl {
   final TextEditingController repsCtr;
   final TextEditingController pesoCtr;
@@ -534,11 +663,11 @@ class _SerieEditCtrl {
     required List<String> dropsets,
   })  : repsCtr = TextEditingController(text: reps),
         pesoCtr = TextEditingController(text: peso),
-        // Creamos un controlador por cada valor de dropset existente
+        
         dropsetCtrls =
             dropsets.map((d) => TextEditingController(text: d)).toList();
 
-  // Libera todos los controladores de esta serie de una vez
+  
   void dispose() {
     repsCtr.dispose();
     pesoCtr.dispose();

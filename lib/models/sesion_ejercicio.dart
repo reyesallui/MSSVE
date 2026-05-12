@@ -1,11 +1,12 @@
 import 'dart:convert';
 import 'package:equatable/equatable.dart';
-import 'rutina_ejercicio.dart'; // Reutilizamos SerieDetalle que ya existe en el proyecto
+import 'rutina_ejercicio.dart'; 
 import 'ejercicio.dart';
 
-// Representa un ejercicio realizado dentro de una sesión real.
-// Los pesos y series son los que el usuario hizo de verdad ese día,
-// no los de la plantilla.
+
+
+
+// Registro de ejercicio realizado en una sesion: series realizadas con detalle
 class SesionEjercicio extends Equatable {
   final int id;
   final int idSesion;
@@ -24,9 +25,10 @@ class SesionEjercicio extends Equatable {
   });
 
   factory SesionEjercicio.fromJson(Map<String, dynamic> json) {
-    // Mismo patrón que RutinaEjercicio para deserializar el JSON de series
+    
     List<SerieDetalle> series = [];
     final raw = json['series_realizadas'];
+// Deserializa JSON de series realizadas durante la sesion
     if (raw != null && raw.toString().isNotEmpty) {
       try {
         final lista = jsonDecode(raw.toString()) as List<dynamic>;
@@ -52,7 +54,7 @@ class SesionEjercicio extends Equatable {
     'id_sesion':       idSesion,
     'id_ejercicio':    idEjercicio,
     'ejercicio':       ejercicio.toJson(),
-    // Si no hay series guardamos null en lugar de un array vacío
+    
     'series_realizadas': seriesRealizadas.isEmpty
         ? null
         : jsonEncode(seriesRealizadas.map((s) => s.toJson()).toList()),
@@ -60,7 +62,7 @@ class SesionEjercicio extends Equatable {
   };
 
   @override
-  // seriesRealizadas incluido para detectar cambios al modificar pesos/reps
+  
   List<Object?> get props =>
       [id, idSesion, idEjercicio, seriesRealizadas, duracionMinutos];
 }

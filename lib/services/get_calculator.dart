@@ -1,5 +1,5 @@
 class GETCalculator {
-  /// Calcula el Gasto Energético Total (GET) usando la fórmula Mifflin.
+  
  
   static double calcularGET({
     required double peso,

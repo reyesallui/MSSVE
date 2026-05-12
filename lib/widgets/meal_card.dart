@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 
 import '../models/comida.dart';
 
-// Tarjeta expandible que muestra una toma del día (Desayuno, Almuerzo...).
-// Se puede expandir para ver los alimentos y sus kcal individuales.
-// El botón de añadir abre el buscador de alimentos para esa toma
+
+
+
+// Tarjeta de comida con lista de alimentos, total de kcal y macros
 class MealCard extends StatelessWidget {
   final Comida comida;
   final VoidCallback onAnadirAlimento;
@@ -56,7 +57,7 @@ class MealCard extends StatelessWidget {
           ],
         ),
         children: [
-          // Lista de alimentos de esta toma
+          
           ...comida.alimentos.map((ca) => ListTile(
                 contentPadding: EdgeInsets.zero,
                 dense: true,
@@ -89,7 +90,7 @@ class MealCard extends StatelessWidget {
                 ),
               )),
 
-          // Botón para añadir un alimento a esta toma
+          
           TextButton.icon(
             onPressed: onAnadirAlimento,
             icon: const Icon(Icons.add,
@@ -104,7 +105,7 @@ class MealCard extends StatelessWidget {
     );
   }
 
-  // Icono diferente según el tipo de comida para identificarlas visualmente
+  
   Widget _iconoTipoComida(String tipo) {
     final iconos = {
       'Desayuno': Icons.free_breakfast_outlined,

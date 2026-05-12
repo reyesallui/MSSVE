@@ -1,8 +1,9 @@
 import 'package:equatable/equatable.dart';
 
-// Representa un ejercicio de la BD o creado por el usuario.
-// Almacena el nombre en los tres idiomas para mostrarlo
-// en el idioma activo sin volver a consultar la BD.
+
+
+
+// Modelo de ejercicio con nombres multidioma (es/en/fr) y clasificacion (cardio/grupo muscular)
 class Ejercicio extends Equatable {
   final int id;
   final int? idUsuario;
@@ -24,9 +25,10 @@ class Ejercicio extends Equatable {
     this.esPersonalizado = false,
   });
 
-  // Devuelve el nombre en el idioma activo.
-  // Si el idioma no está soportado o el nombre está vacío
-  // cae al español como fallback.
+  
+  
+  
+// Retorna el nombre del ejercicio segun el idioma activo, con fallback a espanol
   String nombrePara(String languageCode) {
     switch (languageCode) {
       case 'en':
@@ -38,15 +40,16 @@ class Ejercicio extends Equatable {
     }
   }
 
-  // Propiedad de conveniencia — nombre en el idioma actual
-  // usado en todo el código existente que accede a ejercicio.nombre
+  
+  
   String get nombre => nombreEs;
 
   factory Ejercicio.fromJson(Map<String, dynamic> json) {
-    // Soporte para ambos esquemas:
-    // - BD nueva: nombre_es / nombre_en / nombre_fr
-    // - BD antigua o ejercicio personalizado: nombre (se copia a los tres)
+    
+    
+    
     final nombreFallback = json['nombre'] as String? ?? '';
+// Compatibilidad con datos legacy que usan solo 'nombre' sin sufijo de idioma
     return Ejercicio(
       id:              json['id'] as int,
       idUsuario:       json['id_usuario'] as int?,

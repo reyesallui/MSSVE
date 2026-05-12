@@ -9,8 +9,9 @@ import '../../repositories/repository_sesion.dart';
 part 'sesion_event.dart';
 part 'sesion_state.dart';
 
-// Gestiona el diario de entrenamiento.
-// Mismo patrón que RutinaBloc: un evento por acción, un estado que escucha la UI.
+
+
+// BloC de sesiones de entrenamiento: historial, crear desde plantilla y registrar ejercicios en vivo
 class SesionBloc extends Bloc<SesionEvent, SesionState> {
   final RepositorySesion _repository;
 
@@ -26,7 +27,7 @@ class SesionBloc extends Bloc<SesionEvent, SesionState> {
     on<SesionEliminarEvent>(_onEliminar);
   }
 
-  // /CARGAR HISTORIAL/
+  
   Future<void> _onCargarHistorial(
     SesionCargarHistorialEvent event,
     Emitter<SesionState> emit,
@@ -40,9 +41,9 @@ class SesionBloc extends Bloc<SesionEvent, SesionState> {
     }
   }
 
-  // /CREAR SESIÓN/
-  // Si ya existe sesión para esa fecha y rutina la carga en lugar de crear una nueva.
-  // event.fecha es null cuando se entrena hoy — en ese caso usamos DateTime.now().
+  
+  
+  
   Future<void> _onCrear(
     SesionCrearEvent event,
     Emitter<SesionState> emit,
@@ -56,18 +57,19 @@ class SesionBloc extends Bloc<SesionEvent, SesionState> {
 
     try {
       final sesionExistente = await _repository.getSesionDelDia(
+// Si ya hay sesion para esa rutina y fecha, la reanuda en vez de crear otra
         idRutina:  event.idRutina,
         idUsuario: event.idUsuario,
         fecha:     fecha,
       );
 
       if (sesionExistente != null) {
-        // Ya existe la seleccionamos sin crear duplicado
+        
         emit(loaded.copyWith(sesionActiva: sesionExistente));
         return;
       }
 
-      // No existe creamos nueva con los ejercicios de la plantilla como punto de partida
+      
       final sesion = await _repository.crearSesion(
         idRutina:            event.idRutina,
         idUsuario:           event.idUsuario,
@@ -84,7 +86,7 @@ class SesionBloc extends Bloc<SesionEvent, SesionState> {
     }
   }
 
-  // /SELECCIONAR SESIÓN/
+  
   void _onSeleccionar(
     SesionSeleccionarEvent event,
     Emitter<SesionState> emit,
@@ -94,8 +96,8 @@ class SesionBloc extends Bloc<SesionEvent, SesionState> {
     }
   }
 
-  // /MODIFICAR EJERCICIO/
-  // Recarga la sesión completa tras guardar para que la UI refleje los cambios
+  
+  
   Future<void> _onModificarEjercicio(
     SesionModificarEjercicioEvent event,
     Emitter<SesionState> emit,
@@ -121,7 +123,7 @@ class SesionBloc extends Bloc<SesionEvent, SesionState> {
     }
   }
 
-  // /AÑADIR EJERCICIO/
+  
   Future<void> _onAnadirEjercicio(
     SesionAnadirEjercicioEvent event,
     Emitter<SesionState> emit,
@@ -148,7 +150,7 @@ class SesionBloc extends Bloc<SesionEvent, SesionState> {
     }
   }
 
-  // /ELIMINAR EJERCICIO/
+  
   Future<void> _onEliminarEjercicio(
     SesionEliminarEjercicioEvent event,
     Emitter<SesionState> emit,
@@ -170,8 +172,8 @@ class SesionBloc extends Bloc<SesionEvent, SesionState> {
     }
   }
 
-  // /ELIMINAR SESIÓN/
-  // clearSesionActiva limpia la sesión activa si era la que se borró
+  
+  
   Future<void> _onEliminar(
     SesionEliminarEvent event,
     Emitter<SesionState> emit,
@@ -181,6 +183,7 @@ class SesionBloc extends Bloc<SesionEvent, SesionState> {
     try {
       await _repository.eliminarSesion(event.id);
       final eraActiva = loaded.sesionActiva?.id == event.id;
+// Si se elimina la sesion activa, la limpia del estado
       emit(loaded.copyWith(
         historial:         loaded.historial.where((s) => s.id != event.id).toList(),
         clearSesionActiva: eraActiva,

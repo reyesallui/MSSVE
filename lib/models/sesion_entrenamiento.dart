@@ -1,16 +1,17 @@
 import 'package:equatable/equatable.dart';
 import 'sesion_ejercicio.dart';
 
-// Representa una sesión real de entrenamiento en un día concreto.
-// Es independiente de la rutina plantilla — los pesos y ejercicios
-// pueden diferir de lo planificado.
+
+
+
+// Modelo de sesion de entrenamiento completada con ejercicios realizados
 class SesionEntrenamiento extends Equatable {
   final int id;
   final int idRutina;
   final int idUsuario;
   final DateTime fecha;
   final String? notas;
-  // Nombre de la plantilla usada, para mostrarlo en el historial sin consulta extra
+  
   final String nombreRutina;
   final List<SesionEjercicio> ejercicios;
 
@@ -29,7 +30,7 @@ class SesionEntrenamiento extends Equatable {
       id:           json['id'] as int,
       idRutina:     json['id_rutina'] as int,
       idUsuario:    json['id_usuario'] as int,
-      // DateTime.parse convierte el string 'yyyy-MM-dd' de la BD a DateTime
+      
       fecha:        DateTime.parse(json['fecha'].toString()),
       notas:        json['notas'] as String?,
       nombreRutina: json['nombre_rutina'] as String? ?? '',

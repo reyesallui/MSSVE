@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
-// Botón principal de la app con color rojo primario.
-// Cuando isLoading es true muestra un spinner y se desactiva
-// para evitar que el usuario lance la misma acción dos veces
+
+
+
+// Boton principal reutilizable con estado de carga y estilo rojo consistente
 class PrimaryButton extends StatelessWidget {
   final String label;
   final VoidCallback? onPressed;

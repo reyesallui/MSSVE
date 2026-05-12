@@ -6,6 +6,7 @@ import '../../../repositories/repository_perfil.dart';
 part 'perfil_event.dart';
 part 'perfil_state.dart';
 
+// BloC del perfil: carga, actualiza datos personales y cambia contrasena
 class PerfilBloc extends Bloc<PerfilEvent, PerfilState> {
   final RepositoryPerfil _repository;
 
@@ -27,6 +28,7 @@ class PerfilBloc extends Bloc<PerfilEvent, PerfilState> {
     }
   }
 
+  // Actualiza perfil: recalcula el GET y persiste los cambios
   Future<void> _onActualizar(PerfilActualizarEvent event, Emitter<PerfilState> emit) async {
     emit(const PerfilLoading());
     try {
@@ -42,6 +44,7 @@ class PerfilBloc extends Bloc<PerfilEvent, PerfilState> {
     }
   }
 
+  // Cambia contraseÃ±a: verifica la actual aplicando hash antes de guardar la nueva
   Future<void> _onCambiarPassword(PerfilCambiarPasswordEvent event, Emitter<PerfilState> emit) async {
     emit(const PerfilLoading());
     try {

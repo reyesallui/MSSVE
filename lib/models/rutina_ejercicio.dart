@@ -2,13 +2,14 @@ import 'dart:convert';
 import 'package:equatable/equatable.dart';
 import 'ejercicio.dart';
 
-// Representa una serie individual dentro de un ejercicio de rutina.
-// Cada serie tiene sus propias repeticiones, peso y opcionalmente dropsets.
+
+
+// Modelo de detalle por serie: repeticiones, peso opcional, dropsets
 class SerieDetalle extends Equatable {
   final int reps;
   final double? peso;
   final bool dropset;
-  // Lista de pesos de cada dropset (sin pausa de descanso completa)
+  
   final List<double> dropsets;
 
   const SerieDetalle({
@@ -54,6 +55,7 @@ class SerieDetalle extends Equatable {
   List<Object?> get props => [reps, peso, dropset, dropsets];
 }
 
+// Relacion N:M entre rutina y ejercicio con series/repeticiones/peso y series detalle en JSON
 class RutinaEjercicio extends Equatable {
   final int id;
   final int idRutina;
@@ -63,7 +65,7 @@ class RutinaEjercicio extends Equatable {
   final double? pesoKg;
   final int? duracionMinutos;
   final Ejercicio ejercicio;
-  // Detalle por serie — si está vacío usa los valores legacy (series/reps/peso)
+  
   final List<SerieDetalle> seriesDetalle;
 
   const RutinaEjercicio({
@@ -79,9 +81,10 @@ class RutinaEjercicio extends Equatable {
   });
 
   factory RutinaEjercicio.fromJson(Map<String, dynamic> json) {
-    // Parseamos series_detalle si existe en el JSON
+    
     List<SerieDetalle> detalle = [];
     final raw = json['series_detalle'];
+// Deserializa JSON de series detalle (cada serie con reps, peso, dropsets)
     if (raw != null && raw.toString().isNotEmpty) {
       try {
         final lista = jsonDecode(raw.toString()) as List<dynamic>;

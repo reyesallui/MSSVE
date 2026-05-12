@@ -11,9 +11,10 @@ import 'package:mssve/widgets/create_food_dialog.dart';
 import 'package:mssve/widgets/food_search_delegate.dart';
 import 'package:mssve/widgets/meal_card.dart';
 
-// Pantalla principal de nutrición.
-// Muestra las comidas del día divididas en pestañas (Desayuno, Almuerzo...)
-// y permite navegar entre días con los botones ← →.
+
+
+
+// Pantalla de nutricion: registro diario de comidas y alimentos con busqueda
 class NutricionScreen extends StatefulWidget {
   const NutricionScreen({super.key});
 
@@ -22,9 +23,9 @@ class NutricionScreen extends StatefulWidget {
 }
 
 class _NutricionScreenState extends State<NutricionScreen> {
-  // Valores internos que se guardan en la BD, nunca cambian aunque cambie el idioma
+  
   static const _tiposComida = ['Desayuno', 'Almuerzo', 'Merienda', 'Cena', 'Extra'];
-  // Claves de traducción para cada tipo, tienen que estar en el mismo orden que _tiposComida
+  
   static const _clavesTrad = [
     'nutricion.breakfast',
     'nutricion.lunch',
@@ -33,13 +34,13 @@ class _NutricionScreenState extends State<NutricionScreen> {
     'nutricion.extra',
   ];
 
-  // Fecha que se está visualizando. Empieza en hoy y cambia con los botones ← →
+  
   DateTime _fechaSeleccionada = DateTime.now();
 
-  // Compara solo año, mes y día para saber si estamos en el día de hoy
+  
 
-  // Límite máximo de 7 días hacia el futuro.
-  // Normalizamos las fechas eliminando la hora para comparar solo día/mes/año.
+  
+  
   bool get _esFuturoLejano {
     final limiteMax = DateTime.now().add(const Duration(days: 7));
     final fechaNorm = DateTime(_fechaSeleccionada.year,
@@ -54,8 +55,8 @@ class _NutricionScreenState extends State<NutricionScreen> {
     _cargarDatos();
   }
 
-  // /CARGA DE DATOS/
-  // Manda el evento de carga al NutricionBloc con el usuario y la fecha seleccionada
+  
+  
   void _cargarDatos() {
     final authState = context.read<AuthBloc>().state;
     if (authState is AuthSuccess) {
@@ -66,15 +67,15 @@ class _NutricionScreenState extends State<NutricionScreen> {
     }
   }
 
-  // /NAVEGACIÓN ENTRE DÍAS/
-  // Retrocede un día y recarga los datos
+  
+  
   void _diaAnterior() {
     setState(() => _fechaSeleccionada =
         _fechaSeleccionada.subtract(const Duration(days: 1)));
     _cargarDatos();
   }
 
-  // Avanza un día — bloqueado si ya estamos en el límite de +7 días
+  
   void _diaSiguiente() {
     if (_esFuturoLejano) return;
     setState(() => _fechaSeleccionada =
@@ -82,9 +83,9 @@ class _NutricionScreenState extends State<NutricionScreen> {
     _cargarDatos();
   }
 
-  // /BUSCADOR DE ALIMENTOS/
-  // showSearch abre una pantalla de búsqueda completa gestionada por FoodSearchDelegate.
-  // Cuando el usuario elige un alimento, se abre AddFoodDialog para introducir los gramos.
+  
+  
+  
   Future<void> _abrirBuscador(BuildContext context, String tipoComida) async {
     final authState = context.read<AuthBloc>().state;
     if (authState is! AuthSuccess) return;
@@ -115,14 +116,14 @@ class _NutricionScreenState extends State<NutricionScreen> {
     ));
   }
 
-  // /CREAR ALIMENTO/
-  // Abre CreateFoodDialog y manda el evento de creación al bloc
+  
+  
   Future<void> _abrirCrearAlimento(BuildContext context) async {
     final authState = context.read<AuthBloc>().state;
     if (authState is! AuthSuccess) return;
 
-    // El dialog devuelve un Map con los datos — uso Map<String, dynamic>
-    // porque los valores son de distintos tipos (String, double)
+    
+    
     final datos = await showDialog<Map<String, dynamic>>(
       context: context,
       builder: (_) => const CreateFoodDialog(),
@@ -139,9 +140,9 @@ class _NutricionScreenState extends State<NutricionScreen> {
     ));
   }
 
-  // /EDITAR ALIMENTO/
-  // Abre el buscador, comprueba que el alimento sea personalizado y permite editarlo.
-  // Solo se pueden editar alimentos creados por el propio usuario, no los globales.
+  
+  
+  
   Future<void> _abrirEditarAlimento(BuildContext context) async {
     final authState = context.read<AuthBloc>().state;
     if (authState is! AuthSuccess) return;
@@ -165,7 +166,7 @@ class _NutricionScreenState extends State<NutricionScreen> {
 
     if (!context.mounted) return;
 
-    // Reutilizamos CreateFoodDialog pasándole el alimento para que los campos vengan rellenos
+    
     final datos = await showDialog<Map<String, dynamic>>(
       context: context,
       builder: (_) => CreateFoodDialog(alimentoEditar: alimento),
@@ -182,15 +183,15 @@ class _NutricionScreenState extends State<NutricionScreen> {
     ));
   }
 
-  // /BUILD/
+  
   @override
   Widget build(BuildContext context) {
-    // Leer context.locale suscribe este widget al locale y fuerza
-    // el rebuild automático cuando el usuario cambia el idioma
+    
+    
     final locale = context.locale;
 
-    // DefaultTabController gestiona las 5 pestañas sin necesitar
-    // un TabController manual en initState
+    
+    
     return DefaultTabController(
       length: _tiposComida.length,
       child: Scaffold(
@@ -223,9 +224,9 @@ class _NutricionScreenState extends State<NutricionScreen> {
               onPressed: () => _abrirEditarAlimento(context),
             ),
           ],
-          // /NAVEGADOR DE FECHAS Y PESTAÑAS/
-          // PreferredSize apila el navegador de fechas encima del TabBar
-          // dentro del bottom del AppBar
+          
+          
+          
           bottom: PreferredSize(
             preferredSize: const Size.fromHeight(96),
             child: Column(
@@ -243,7 +244,7 @@ class _NutricionScreenState extends State<NutricionScreen> {
                         DateFormat('EEE d MMM', locale.toString())
                             .format(_fechaSeleccionada),
                         style: TextStyle(
-                          // Rojo si es pasado, blanco si es hoy o futuro
+                          
                           color: _fechaSeleccionada.isBefore(DateTime(
                               DateTime.now().year,
                               DateTime.now().month,
@@ -271,7 +272,7 @@ class _NutricionScreenState extends State<NutricionScreen> {
                   unselectedLabelColor: Colors.grey,
                   onTap: (index) => context.read<NutricionBloc>().add(
                       NutricionCambiarTipoComidaEvent(_tiposComida[index])),
-                  // Generamos los tabs con un for en lugar de escribirlos uno a uno
+                  
                   tabs: [
                     for (final clave in _clavesTrad) Tab(text: clave.tr()),
                   ],
@@ -281,7 +282,7 @@ class _NutricionScreenState extends State<NutricionScreen> {
           ),
         ),
 
-        // /BODY/
+        
         body: BlocBuilder<NutricionBloc, NutricionState>(
           builder: (context, state) {
             if (state is NutricionLoading || state is NutricionInitial) {
@@ -304,13 +305,13 @@ class _NutricionScreenState extends State<NutricionScreen> {
             }
             if (state is NutricionLoaded) {
               final registro = state.registroDiario;
-              // List.generate crea un widget por cada tipo de comida.
-              // Usamos el índice i para acceder tanto a _tiposComida como a _clavesTrad a la vez.
+              
+              
               return TabBarView(
                 children: List.generate(_tiposComida.length, (i) {
                   final tipo  = _tiposComida[i];
                   final clave = _clavesTrad[i];
-                  // firstOrNull devuelve null si no hay comida de ese tipo en lugar de lanzar error
+                  
                   final comida = registro.comidas
                       .where((c) => c.tipoComida == tipo)
                       .firstOrNull;
@@ -325,8 +326,8 @@ class _NutricionScreenState extends State<NutricionScreen> {
                             : 2000,
                       ),
                       const SizedBox(height: 16),
-                      // Si ya hay comida en este tipo mostramos la tarjeta,
-                      // si no mostramos el botón de añadir
+                      
+                      
                       if (comida != null)
                         MealCard(
                           comida: comida,
@@ -354,8 +355,8 @@ class _NutricionScreenState extends State<NutricionScreen> {
   }
 }
 
-// /RESUMEN DE CALORÍAS/
-// Tarjeta que muestra las kcal consumidas hoy frente al objetivo del usuario
+
+
 class _ResumenKcal extends StatelessWidget {
   final double kcalConsumidas;
   final double kcalObjetivo;
@@ -375,7 +376,7 @@ class _ResumenKcal extends StatelessWidget {
           Text('nutricion.calories_today'.tr(),
               style: const TextStyle(color: Colors.grey)),
           Text(
-            // toStringAsFixed(0) redondea sin decimales
+            
             '${kcalConsumidas.toStringAsFixed(0)} / ${kcalObjetivo.toStringAsFixed(0)} kcal',
             style: const TextStyle(
                 color: Color(0xFFD32F2F), fontWeight: FontWeight.bold),
@@ -386,10 +387,10 @@ class _ResumenKcal extends StatelessWidget {
   }
 }
 
-// /BOTÓN CREAR COMIDA/
-// Se muestra cuando no hay ningún alimento registrado en ese tipo de comida.
-// tipo = valor interno en español para la BD
-// tipoTraducido = texto ya traducido al idioma activo para mostrarlo en pantalla
+
+
+
+
 class _BotonCrearComida extends StatelessWidget {
   final String tipo;
   final String tipoTraducido;
@@ -403,7 +404,7 @@ class _BotonCrearComida extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // InkWell añade el efecto ripple de Material al pulsar
+    
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),

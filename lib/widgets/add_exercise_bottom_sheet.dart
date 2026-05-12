@@ -8,6 +8,7 @@ import 'package:mssve/models/rutina_ejercicio.dart';
 import 'package:mssve/widgets/custom_text_field.dart';
 import 'package:mssve/widgets/primary_button.dart';
 
+// Bottom sheet para buscar y anadir ejercicios con filtros
 class AddExerciseBottomSheet extends StatefulWidget {
   final int idRutina;
   final int idUsuario;
@@ -36,7 +37,7 @@ class _AddExerciseBottomSheetState extends State<AddExerciseBottomSheet> {
   void initState() {
     super.initState();
     _series = List.generate(3, (_) => _SerieController());
-    // Búsqueda vacía inicial para mostrar todos los ejercicios al abrir
+    
     context.read<RutinaBloc>().add(RutinaBuscarEjerciciosEvent(
       search: '',
       idUsuario: widget.idUsuario,

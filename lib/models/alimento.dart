@@ -1,7 +1,8 @@
 import 'package:equatable/equatable.dart';
 
-/// Representa un alimento, ya sea global del sistema (idUsuario == null)
-/// o personalizado creado por el usuario (idUsuario != null, esPersonalizado == true).
+
+
+// Modelo de alimento con macros por 100g y metodos de calculo por cantidad
 class Alimento extends Equatable {
   final int id;
   final int? idUsuario;
@@ -51,7 +52,7 @@ class Alimento extends Equatable {
     };
   }
 
-  // copyWith
+  
   Alimento copyWith({
     int? id,
     int? idUsuario,
@@ -75,15 +76,17 @@ class Alimento extends Equatable {
     );
   }
 
-  /// Calcula las Kcal para una cantidad específica de gramos.
-  /// Lo usamos en el AddFoodDialog.
+  
+  
+// Calcula kcal segun gramos: (kcal_por_100g * gramos) / 100
   double calcularKcal(double gramos) {
     return double.parse(
       ((kcalPor100g * gramos) / 100).toStringAsFixed(2),
     );
   }
 
-  /// Calcula los macros para una cantidad específica de gramos.
+  
+// Calcula proteinas/carbohidratos/grasas segun cantidad en gramos
   Map<String, double> calcularMacros(double gramos) {
     return {
       'proteinas': double.parse(

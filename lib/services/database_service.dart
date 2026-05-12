@@ -1,8 +1,8 @@
-import 'package:flutter/foundation.dart';
 import 'package:mysql_client/mysql_client.dart';
 
-// Gestiona la conexión con MySQL y expone los métodos
-// query() e insert() que usan todos los repositorios.
+
+
+// Servicio de conexion MySQL con migraciones automaticas y sistema de parametros nombrados
 class DatabaseService {
   MySQLConnection? _connection;
   static const String _host     = 'sql8.freesqldatabase.com';
@@ -12,7 +12,8 @@ class DatabaseService {
   static const String _database = 'sql8825716';
   static const bool   _secure   = false;
 
-  // Abre la conexión  se llama una sola vez al arrancar la app
+  
+// Conecta a MySQL remoto y ejecuta migraciones para mantener esquema actualizado
   Future<void> connect() async {
     _connection = await MySQLConnection.createConnection(
       host: _host,
@@ -26,7 +27,8 @@ class DatabaseService {
     await _ejecutarMigraciones();
   }
 
-  // Migraciones automáticas al empezar: añade la columna duracion_minutos a sesion_ejercicio si no existe
+  
+// Migraciones automaticas: agrega columnas faltantes sin intervencion manual
   Future<void> _ejecutarMigraciones() async {
     try {
       final check = await _connection!.execute(
@@ -40,27 +42,29 @@ class DatabaseService {
     } catch (_) {}
   }
 
-  // Ejecuta SELECT y devuelve los resultados como lista de Maps
+  
   Future<List<Map<String, dynamic>>> query(
     String sql, [
     List<Object?> params = const [],
   ]) async {
     _checkConnection();
     final prepared = _prepararParams(sql, params);
+// Convierte ? posicionales a :p0, :p1... para el driver MySQL que usa parametros nombrados
     final result = await _connection!.execute(prepared.sql, prepared.params);
     return result.rows.map((row) => row.typedAssoc()).toList();
   }
 
-  // Ejecuta INSERT y devuelve el id generado por AUTO_INCREMENT
+  
   Future<int> insert(String sql, [List<Object?> params = const []]) async {
     _checkConnection();
     final prepared = _prepararParams(sql, params);
+// Convierte ? posicionales a :p0, :p1... para el driver MySQL que usa parametros nombrados
     final result = await _connection!.execute(prepared.sql, prepared.params);
     return result.lastInsertID.toInt();
   }
 
-  // mysql_client necesita parámetros nombrados (:p0, :p1...)
-  // en lugar de los ? posicionales del SQL estándar
+  
+  
   _PreparedQuery _prepararParams(String sql, List<Object?> params) {
     if (params.isEmpty) return _PreparedQuery(sql: sql, params: null);
     final Map<String, dynamic> namedParams = {};
@@ -84,7 +88,7 @@ class DatabaseService {
   }
 }
 
-// Agrupa el SQL procesado con sus parámetros nombrados
+
 class _PreparedQuery {
   final String sql;
   final Map<String, dynamic>? params;

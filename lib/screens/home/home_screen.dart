@@ -11,6 +11,7 @@ import 'package:mssve/widgets/macro_progress_card.dart';
 import 'package:mssve/widgets/workout_summary_card.dart';
 
 
+// Pantalla principal con resumen del dia: kcal, macros, progreso y acceso rapido
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
   @override
@@ -23,18 +24,18 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    _cargarDatos(); // Cargo los datos nada más abrir la pantalla
+    _cargarDatos(); 
   }
 
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // didChangeDependencies se ejecuta cuando algo del contexto del que depende este widget cambia,
-    // por ejemplo cuando el usuario cambia el idioma de la app
-    // A diferencia de initState, aquí sí puedo acceder de forma segura al contexto heredado como el locale
-    // Llamo a setState() vacío para forzar que el widget se reconstruya entero,
-    // así la fecha, el saludo y todos los textos traducidos se actualizan al instante
+    
+    
+    
+    
+    
     setState(() {});
   }
 
@@ -44,17 +45,17 @@ class _HomeScreenState extends State<HomeScreen> {
     if (authState is AuthSuccess) {
       context.read<HomeBloc>().add(HomeLoadEvent(
         idUsuario: authState.usuario.id,
-        fecha: DateFormat('yyyy-MM-dd').format(DateTime.now()), // Fecha de hoy formateada para la API
+        fecha: DateFormat('yyyy-MM-dd').format(DateTime.now()), 
       ));
     }
   }
 
 
-  // BUILD
+  
   @override
   Widget build(BuildContext context) {
-    // Leer context.locale suscribe este widget al locale
-    // cuando el usuario cambie de idioma Flutter reconstruye este widget automáticamente
+    
+    
     final locale = context.locale;
 
     return Scaffold(
@@ -76,7 +77,7 @@ class _HomeScreenState extends State<HomeScreen> {
           if (state is HomeLoading || state is HomeInitial) {
             return const Center(child: CircularProgressIndicator());
           }
-          // Si hay error muestro el mensaje y un botón para reintentar
+          
           if (state is HomeError) {
             return Center(child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -99,27 +100,27 @@ class _HomeScreenState extends State<HomeScreen> {
             Usuario? usuario;
             if (authState is AuthSuccess) usuario = authState.usuario;
 
-            // Si el gasto energético del usuario es mayor que 0 lo uso, si no pongo 2000 por defecto
-            // Este valor viene calculado en la BD con la fórmula de Mifflin-St Jeor
+            
+            
             final kcalObjetivo = (usuario?.gastoEnergeticoTotal ?? 0) > 0
                 ? usuario!.gastoEnergeticoTotal
                 : 2000.0;
 
-            // Calculo los gramos objetivo de cada macro a partir de las kcal totales
-            // Proteínas y carbos tienen 4 kcal por gramo, las grasas tienen 9 kcal por gramo
-            final proteinasObj = (kcalObjetivo * 0.30) / 4; // 30% de las kcal para proteínas
-            final carbosObj    = (kcalObjetivo * 0.45) / 4; // 45% para carbohidratos
-            final grasasObj    = (kcalObjetivo * 0.25) / 9; // 25% para grasas
+            
+            
+            final proteinasObj = (kcalObjetivo * 0.30) / 4; 
+            final carbosObj    = (kcalObjetivo * 0.45) / 4; 
+            final grasasObj    = (kcalObjetivo * 0.25) / 9; 
 
-            // RefreshIndicator permite recargar los datos arrastrando la lista hacia abajo
+            
             return RefreshIndicator(
               onRefresh: () async => _cargarDatos(),
               color: const Color(0xFFD32F2F),
               child: ListView(
                 padding: const EdgeInsets.all(16),
                 children: [
-                  // Paso locale.toString() para que la fecha se formatee en el idioma activo
-                  // en español sale "lunes, 24 marzo", en inglés "Monday, March 24"
+                  
+                  
                   Text(
                     DateFormat('EEEE, d MMMM', locale.toString())
                         .format(DateTime.now()),
@@ -127,7 +128,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    // Si hay usuario muestro su nombre en el saludo, si no un saludo genérico
+                    
                     usuario != null
                         ? 'home.welcome'.tr(args: [usuario.nombre])
                         : 'home.welcome_generic'.tr(),
@@ -137,13 +138,13 @@ class _HomeScreenState extends State<HomeScreen> {
                         fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 20),
-                  // Círculo de progreso de calorías consumidas frente al objetivo
+                  
                   CalorieProgressCard(
                     kcalConsumidas: registro.kcalConsumidas,
                     kcalObjetivo: kcalObjetivo,
                   ),
                   const SizedBox(height: 12),
-                  // Barras de progreso de proteínas, carbos y grasas
+                  
                   MacroProgressCard(
                     proteinas: macros['proteinas'] ?? 0,
                     carbohidratos: macros['carbohidratos'] ?? 0,
@@ -153,14 +154,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     grasasObjetivo: grasasObj,
                   ),
                   const SizedBox(height: 12),
-                  // Botón de acceso rápido para ir a registrar una comida
+                  
                   _AccesoRapido(
                     icon: Icons.restaurant_menu_outlined,
                     label: 'home.log_meal'.tr(),
                     onTap: () => context.go('/nutricion'),
                   ),
                   const SizedBox(height: 12),
-                  // Resumen de las rutinas recientes con botón para ver todas
+                  
                   WorkoutSummaryCard(
                     rutinas: state.rutinas,
                     onVerTodas: () => context.go('/rutina'),
@@ -177,8 +178,8 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 
-// ACCESO RAPIDO
-// Botón genérico con icono, texto y flecha a la derecha para navegar rápido a otra pantalla
+
+
 class _AccesoRapido extends StatelessWidget {
   final IconData icon;
   final String label;
@@ -192,7 +193,7 @@ class _AccesoRapido extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // InkWell añade el efecto ripple(simula una onda al hacer) al pulsar, más visual que un GestureDetector simple
+    
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),
@@ -211,7 +212,7 @@ class _AccesoRapido extends StatelessWidget {
             Text(label,
                 style: const TextStyle(
                     color: Colors.white, fontWeight: FontWeight.w500)),
-            const Spacer(), // Empuja la flecha hacia el extremo derecho
+            const Spacer(), 
             const Icon(Icons.arrow_forward_ios,
                 color: Color(0xFFD32F2F), size: 16),
           ],

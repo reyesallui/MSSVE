@@ -5,6 +5,7 @@ import '../services/database_service.dart';
 import '../services/storage_service.dart';
 import '../utils/crypto_helper.dart';
 
+// Capa de datos de autenticacion: login, registro, sesion cacheada y logout
 class RepositoryAutenticacion {
   final DatabaseService _db;
   final StorageService _storageService;
@@ -21,6 +22,7 @@ class RepositoryAutenticacion {
   }) async {
     try {
       final passwordHash = CryptoHelper.hashPassword(password);
+// Compara hash SHA-256 contra almacenado en BD
       final results = await _db.query(
         'SELECT * FROM usuarios WHERE email = ?',
         [email],
@@ -31,6 +33,7 @@ class RepositoryAutenticacion {
         throw Exception('login.error_invalid');
       }
       final usuario = Usuario.fromJson(Map<String, dynamic>.from(row));
+// Convierte fila SQL a objeto Usuario y guarda sesion local
       await _storageService.saveUserId(usuario.id);
       await _storageService.saveUserJson(jsonEncode(usuario.toJson()));
       return usuario;
@@ -43,6 +46,7 @@ class RepositoryAutenticacion {
     }
   }
 
+// Inserta nuevo usuario con hash y GET calculado; lanza error si email ya existe
   Future<Usuario> register({
     required String nombre,
     required String apellidos,
@@ -58,14 +62,15 @@ class RepositoryAutenticacion {
   }) async {
     try {
       final passwordHash = CryptoHelper.hashPassword(password);
+// Compara hash SHA-256 contra almacenado en BD
       final existing = await _db.query(
         'SELECT id FROM usuarios WHERE email = ?',
         [email],
       );
       if (existing.isNotEmpty) throw Exception('register.error_email_exists');
 
-      // CORREGIDO: gasto_energetico_total sin acento
-      // coincide exactamente con el nombre de la columna en MySQL
+      
+      
       final insertId = await _db.insert(
         '''INSERT INTO usuarios
            (nombre, apellidos, email, password_hash, peso, altura,
@@ -95,6 +100,7 @@ class RepositoryAutenticacion {
     await _storageService.clearAll();
   }
 
+// Intenta restaurar sesion desde JSON local primero, luego desde BD si el JSON falla
   Future<Usuario?> getUsuarioCacheado() async {
     try {
       final hasSession = await _storageService.hasSession();

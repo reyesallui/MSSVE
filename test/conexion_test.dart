@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mysql_client/mysql_client.dart';
 
-// Prueba de conexión real a la base de datos MySQL.
-// Requiere que MySQL esté arrancado antes de ejecutar este test.
-// Ejecutar solo este test: flutter test test/conexion_test.dart
+
+
+
 void main() {
   const host     = '127.0.0.1';
   const port     = 3306;
@@ -28,7 +28,7 @@ void main() {
       expect(conn.connected, isTrue,
           reason: 'La conexión a MySQL debería estar activa');
 
-      // SELECT 1 es la forma estándar de verificar que la BD responde
+      
       final result = await conn.execute('SELECT 1 AS test');
       expect(result.rows.isNotEmpty, isTrue,
           reason: 'SELECT 1 debe devolver al menos una fila');
@@ -60,7 +60,7 @@ void main() {
 
       await conn.connect();
 
-      // Comprobamos que las tablas principales existen
+      
       final tablas = [
         'usuarios',
         'ejercicios',

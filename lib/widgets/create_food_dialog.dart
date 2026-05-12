@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 
 import 'package:mssve/models/alimento.dart';
 
-// Diálogo para crear o editar un alimento personalizado.
-// Si se pasa alimentoEditar, los campos se precargan con sus valores actuales
-// y el título cambia a "Editar alimento".
+
+
+
+// Dialogo para crear alimento personalizado con macros
 class CreateFoodDialog extends StatefulWidget {
   final Alimento? alimentoEditar;
 
@@ -28,7 +29,7 @@ class _CreateFoodDialogState extends State<CreateFoodDialog> {
   void initState() {
     super.initState();
     final a = widget.alimentoEditar;
-    // Si estamos editando, precargamos los valores actuales del alimento
+    
     _nombreCtrl   = TextEditingController(text: a?.nombre ?? '');
     _kcalCtrl     = TextEditingController(text: a != null ? a.kcalPor100g.toString() : '');
     _proteinasCtrl = TextEditingController(text: a != null ? a.proteinasPor100g.toString() : '');

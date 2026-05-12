@@ -1,7 +1,8 @@
-// Calcula el GET usando Mifflin-St Jeor y lo ajusta según el objetivo
+
+// Calculadora de Gasto Energetico Total usando Mifflin-St Jeor + factor de actividad + ajuste por objetivo
 class GETCalculator {
 
-  // *** GET base (Mifflin-St Jeor) ***
+  
   static double calcularGET({
     required double peso,
     required int altura,
@@ -10,20 +11,21 @@ class GETCalculator {
     required String nivelActividad,
     String objetivo = 'Recomposicion',
   }) {
-    // Fórmula distinta para hombre y mujer
+    
     final double tmb = genero == 'Hombre'
+// Formula de Mifflin-St Jeor: varia segun genero (hombres +5, mujeres -161)
         ? (10 * peso) + (6.25 * altura) - (5 * edad) + 5
         : (10 * peso) + (6.25 * altura) - (5 * edad) - 161;
 
     final double get = tmb * _factorActividad(nivelActividad);
 
-    // *** Ajuste por objetivo ***
+    
     final double ajuste = _ajusteObjetivo(objetivo);
 
     return double.parse((get + ajuste).toStringAsFixed(2));
   }
 
-  // *** Factor de actividad ***
+  
   static double _factorActividad(String nivelActividad) {
     switch (nivelActividad) {
       case 'Sedentario':  return 1.2;
@@ -35,10 +37,11 @@ class GETCalculator {
     }
   }
 
-  // *** Ajuste calórico según objetivo ***
-  // Volumen: +400 kcal (superávit para ganar músculo)
-  // Definición: -400 kcal (déficit para perder grasa)
-  // Recomposición: sin ajuste (mantener peso)
+  
+  
+  
+  
+// Ajuste calorico: +400 para volumen, -400 para definicion, 0 para recomposicion
   static double _ajusteObjetivo(String objetivo) {
     switch (objetivo) {
       case 'Volumen':    return 400;

@@ -4,12 +4,14 @@ import 'package:mssve/models/comida_alimento.dart';
 import 'package:mssve/models/registro_diario.dart';
 import 'package:mssve/services/database_service.dart';
 
+// Capa de datos de nutricion: registro diario, comidas, alimentos y sus relaciones
 class RepositoryNutricion {
   final DatabaseService _db;
   RepositoryNutricion({required DatabaseService db}) : _db = db;
 
-  // Devuelve el registro del dia. Si no existe lo crea vacio
-  // para evitar tener que comprobar en la UI si existe o no
+  
+  
+// Obtiene o crea el registro diario para una fecha; carga comidas, alimentos y recalcula kcal totales
   Future<RegistroDiario> getOCCreateRegistroDiario({
     required int idUsuario,
     required String fecha,
@@ -36,8 +38,9 @@ class RepositoryNutricion {
     }
   }
 
-  // Carga el registro con todas sus comidas y dentro de cada comida
-  // todos sus alimentos usando JOIN para evitar multiples consultas
+  
+  
+// Carga registro + comidas + alimentos anidados con JOIN y actualiza kcal_totales_dia
   Future<RegistroDiario> _cargarRegistroCompleto(int registroId) async {
     final registroRows = await _db.query(
       'SELECT * FROM registros_diarios WHERE id = ?',
@@ -45,7 +48,7 @@ class RepositoryNutricion {
     );
     final registroData = Map<String, dynamic>.from(registroRows.first);
 
-    // CORREGIDO: id_registro_diario (sin s al final)
+    
     final comidasRows = await _db.query(
       'SELECT * FROM comidas WHERE id_registro_diario = ?',
       [registroId],
@@ -115,15 +118,15 @@ class RepositoryNutricion {
     });
   }
 
-  // El LIKE con % permite búsqueda parcial: "pec" encuentra "Pechuga de pollo"
-  // Devuelve alimentos globales del sistema y personalizados del usuario
+  
+  
   Future<List<Alimento>> buscarAlimentos({
     required String search,
     required int idUsuario,
   }) async {
     try {
-      // CORREGIDO: SQL en una sola cadena con ''' para evitar
-      // el bug de concatenación sin espacios
+      
+      
       final results = await _db.query(
         '''SELECT * FROM alimentos
            WHERE nombre LIKE ?
@@ -139,7 +142,7 @@ class RepositoryNutricion {
     }
   }
 
-  // MÉTODO QUE FALTABA — el BLoC lo llama al crear un alimento personalizado
+  
   Future<Alimento> crearAlimento({
     required int idUsuario,
     required String nombre,
@@ -161,11 +164,13 @@ class RepositoryNutricion {
         'SELECT * FROM alimentos WHERE id = ?', [insertId],
       );
       return Alimento.fromJson(Map<String, dynamic>.from(results.first));
+// Retorna el alimento creado con sus datos completos
     } catch (e) {
       throw Exception('error.unknown');
     }
   }
 
+// Actualiza campos de un alimento existente
   Future<Alimento> editarAlimento({
     required int id,
     required String nombre,
@@ -175,7 +180,7 @@ class RepositoryNutricion {
     required double grasasPor100g,
   }) async {
     try {
-      // CORREGIDO: SQL en una sola cadena con '''
+      
       await _db.query(
         '''UPDATE alimentos SET
            nombre = ?, kcal_por_100g = ?, proteinas_por_100g = ?,
@@ -188,6 +193,7 @@ class RepositoryNutricion {
         'SELECT * FROM alimentos WHERE id = ?', [id],
       );
       return Alimento.fromJson(Map<String, dynamic>.from(results.first));
+// Retorna el alimento creado con sus datos completos
     } catch (e) {
       throw Exception('error.unknown');
     }
@@ -199,7 +205,7 @@ class RepositoryNutricion {
     String? hora,
   }) async {
     try {
-      // CORREGIDO: "inset" → "INSERT"
+      
       final insertId = await _db.insert(
         'INSERT INTO comidas (id_registro_diario, tipo_comida, hora) VALUES (?, ?, ?)',
         [idRegistroDiario, tipoComida, hora],
@@ -216,8 +222,8 @@ class RepositoryNutricion {
     }
   }
 
-  // Las kcal se calculan en la app y se guardan en la BD
-  // para no recalcularlas cada vez que se carga el registro
+  
+  
   Future<ComidaAlimento> anadirAlimentoAComida({
     required int idComida,
     required int idAlimento,
@@ -228,6 +234,7 @@ class RepositoryNutricion {
         'SELECT kcal_por_100g FROM alimentos WHERE id = ?', [idAlimento],
       );
       final kcalPor100g = double.parse(
+// Calcula kcal reales del alimento segun la cantidad en gramos
         alimentoRows.first['kcal_por_100g'].toString(),
       );
       final kcalCalculadas =

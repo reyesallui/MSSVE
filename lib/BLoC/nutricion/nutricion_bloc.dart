@@ -8,6 +8,7 @@ import '../../../repositories/repository_nutricion.dart';
 part 'nutricion_event.dart';
 part 'nutricion_state.dart';
 
+// BloC de nutricion: gestiona el registro diario, comidas y alimentos
 class NutricionBloc extends Bloc<NutricionEvent, NutricionState> {
   final RepositoryNutricion _repository;
 
@@ -33,6 +34,7 @@ class NutricionBloc extends Bloc<NutricionEvent, NutricionState> {
     }
   }
 
+// Cambia la pestana activa (Desayuno/Comida/Cena/...) y filtra la vista
   void _onCambiarTipoComida(NutricionCambiarTipoComidaEvent event, Emitter<NutricionState> emit) {
     if (state is NutricionLoaded) {
       emit((state as NutricionLoaded).copyWith(tipoComidaActivo: event.tipoComida));
@@ -82,6 +84,7 @@ class NutricionBloc extends Bloc<NutricionEvent, NutricionState> {
     final loaded = state as NutricionLoaded;
     try {
       final comidaExistente = loaded.registroDiario.comidas
+// Si la comida para ese tipo ya existe, reusa el ID; si no, la crea primero
           .where((c) => c.tipoComida == event.tipoComida).firstOrNull;
       int idComida;
       if (comidaExistente != null) {

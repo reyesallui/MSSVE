@@ -6,6 +6,7 @@ import '../services/storage_service.dart';
 import '../utils/crypto_helper.dart';
 import '../utils/get_calculator.dart';
 
+// Capa de datos del perfil: consulta, actualizacion y cambio de contrasena
 class RepositoryPerfil {
   final DatabaseService _db;
   final StorageService _storageService;
@@ -16,7 +17,7 @@ class RepositoryPerfil {
   })  : _db = db,
         _storageService = storageService;
 
-  // *** Obtener usuario ***
+  
   Future<Usuario> getUsuario(int id) async {
     try {
       final results = await _db.query(
@@ -30,7 +31,7 @@ class RepositoryPerfil {
       if (results.isEmpty) throw Exception('error.unknown');
 
       final usuario = Usuario.fromJson(Map<String, dynamic>.from(results.first));
-      // Sincronizamos caché local con datos frescos de BD
+      
       await _storageService.saveUserJson(jsonEncode(usuario.toJson()));
       return usuario;
     } catch (e) {
@@ -39,9 +40,9 @@ class RepositoryPerfil {
     }
   }
 
-  // *** Actualizar perfil ***
-  // Recalculamos GET con Mifflin-St Jeor incluyendo el objetivo
-  // porque puede haber cambiado peso, altura, edad, actividad u objetivo
+  
+  
+  
   Future<Usuario> actualizarPerfil({
     required int id,
     required String nombre,
@@ -56,6 +57,7 @@ class RepositoryPerfil {
   }) async {
     try {
       final nuevoGet = GETCalculator.calcularGET(
+// Recalcula el gasto energetico total (GET) al actualizar peso/altura/edad/objetivo
         peso: peso,
         altura: altura,
         edad: edad,
@@ -81,8 +83,9 @@ class RepositoryPerfil {
     }
   }
 
-  // *** Cambiar contraseña ***
-  // Nunca comparamos contraseñas en texto plano — siempre hasheamos primero
+  
+  
+// Verifica contrasena actual contra hash almacenado antes de actualizar
   Future<void> cambiarPassword({
     required int userId,
     required String currentPassword,
@@ -110,7 +113,9 @@ class RepositoryPerfil {
       );
     } catch (e) {
       if (e.toString().contains('perfil.') ||
-          e.toString().contains('error.')) rethrow;
+          e.toString().contains('error.')) {
+        rethrow;
+      }
       throw Exception('error.unknown');
     }
   }

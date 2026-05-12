@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
  
-// Campo de texto reutilizable con el estilo oscuro de la app.
-// Centralizar el diseño aquí evita repetir la misma decoración
-// en cada formulario (login, registro, perfil...)
+
+
+
+// Campo de texto personalizado con estilo oscuro y label flotante
 class CustomTextField extends StatelessWidget {
   final TextEditingController controller;
   final String label;

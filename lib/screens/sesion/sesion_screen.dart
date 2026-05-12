@@ -11,7 +11,8 @@ import 'package:mssve/models/ejercicio.dart';
 import 'package:mssve/models/rutina_ejercicio.dart';
 import 'package:mssve/widgets/sesion_ejercicio_card.dart';
 
-// Pantalla de sesión activa — muestra los ejercicios y permite modificar, añadir y eliminar
+
+// Pantalla de sesion de entrenamiento activa con registro en vivo
 class SesionScreen extends StatefulWidget {
   const SesionScreen({super.key});
 
@@ -27,7 +28,7 @@ class _SesionScreenState extends State<SesionScreen> {
     setState(() {});
   }
 
-  //  BUILD 
+  
   @override
   Widget build(BuildContext context) {
     final _ = context.locale;
@@ -56,9 +57,9 @@ class _SesionScreenState extends State<SesionScreen> {
         ],
       ),
 
-      //  FAB 
-      // Capturamos los blocs antes de abrir el sheet porque el context
-      // puede quedar invalidado al cerrarlo
+      
+      
+      
       floatingActionButton: BlocBuilder<SesionBloc, SesionState>(
         buildWhen: (prev, curr) => true,
         builder: (context, state) {
@@ -92,9 +93,9 @@ class _SesionScreenState extends State<SesionScreen> {
         },
       ),
 
-      //  BODY 
-      // buildWhen: true fuerza rebuild siempre — Equatable puede considerar
-      // estados iguales aunque los ejercicios hayan cambiado
+      
+      
+      
       body: BlocBuilder<SesionBloc, SesionState>(
         buildWhen: (prev, curr) => true,
         builder: (context, state) {
@@ -111,14 +112,14 @@ class _SesionScreenState extends State<SesionScreen> {
             final sesion = state.sesionActiva!;
             return Column(children: [
 
-              //  Cabecera 
+              
               Container(
                 padding: const EdgeInsets.all(16),
                 color: const Color(0xFF0F0F0F),
                 child: Row(children: [
                   IconButton(
                     icon: const Icon(Icons.arrow_back, color: Colors.white),
-                    // Recarga el historial antes de salir para reflejar cambios
+                    
                     onPressed: () {
                       context
                           .read<SesionBloc>()
@@ -148,7 +149,7 @@ class _SesionScreenState extends State<SesionScreen> {
                 ]),
               ),
 
-              //  Lista de ejercicios 
+              
               Expanded(
                 child: sesion.ejercicios.isEmpty
                     ? Center(
@@ -185,8 +186,8 @@ class _SesionScreenState extends State<SesionScreen> {
   }
 }
 
-// Sheet añadir ejercicio 
-// Dos pasos: buscador de ejercicios = formulario de series/reps/peso
+
+
 class _AddEjercicioSesionSheet extends StatefulWidget {
   final void Function(int idEjercicio, List<SerieDetalle> series, int? duracionMinutos) onAnadir;
   final int idUsuario;
@@ -211,7 +212,7 @@ class _AddEjercicioSesionSheetState
   void initState() {
     super.initState();
     _series = List.generate(3, (_) => _SerieCtrlSesion());
-    // Búsqueda vacía para mostrar todos los ejercicios al abrir
+    
     context.read<RutinaBloc>().add(RutinaBuscarEjerciciosEvent(
       search: '',
       idUsuario: widget.idUsuario,
@@ -228,7 +229,7 @@ class _AddEjercicioSesionSheetState
     super.dispose();
   }
 
-  //Confirmar 
+  
    
   void _confirmar() {
     if (_ejercicioSeleccionado == null) return;
@@ -278,7 +279,7 @@ class _AddEjercicioSesionSheetState
           )),
           const SizedBox(height: 16),
 
-          //Paso 1: Buscador 
+          
           if (_ejercicioSeleccionado == null) ...[
             Text('sesion.add_exercise'.tr(),
                 style: const TextStyle(color: Colors.white,
@@ -450,7 +451,7 @@ class _AddEjercicioSesionSheetState
               ),
             ),
 
-          //Paso 2: Formulario
+          
           ] else ...[
             Row(children: [
               Expanded(
@@ -478,7 +479,7 @@ class _AddEjercicioSesionSheetState
             ]),
             const SizedBox(height: 16),
 
-              //si es cardio = duracion, si es fuerza = series/reps/peso
+              
               if (_ejercicioSeleccionado!.esCardio)
               TextField(
                 controller: _duracionCtrl,
@@ -563,8 +564,8 @@ class _AddEjercicioSesionSheetState
   }
 }
 
-//Fila de serie con dropsets
-// Igual que _SerieRow en rutinas pero en el contexto de sesión
+
+
 class _SerieRowSesion extends StatelessWidget {
   final int numero;
   final _SerieCtrlSesion ctrl;
@@ -637,7 +638,7 @@ class _SerieRowSesion extends StatelessWidget {
           ),
         ]),
 
-        //Dropsets
+        
         if (ctrl.dropsetActivo) ...[
           Padding(
             padding: const EdgeInsets.only(left: 32, top: 6, bottom: 4),
@@ -706,7 +707,7 @@ class _SerieRowSesion extends StatelessWidget {
   );
 }
 
-//Campo de texto compacto
+
 class _CampoSesion extends StatelessWidget {
   final TextEditingController ctrl;
   final String hint;
@@ -735,7 +736,7 @@ class _CampoSesion extends StatelessWidget {
   }
 }
 
-//Controladores de serie 
+
 class _SerieCtrlSesion {
   final repsCtr = TextEditingController(text: '10');
   final pesoCtr = TextEditingController();
