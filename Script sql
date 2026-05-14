@@ -1,0 +1,276 @@
+-- MSSVE — Script completo para MySQL local
+-- Ejecutar en MySQL Workbench con Ctrl+Shift+Enter
+
+CREATE DATABASE IF NOT EXISTS mssve;
+USE mssve;
+
+SET FOREIGN_KEY_CHECKS = 0;
+
+DROP TABLE IF EXISTS sesion_ejercicio;
+DROP TABLE IF EXISTS sesiones_entrenamiento;
+DROP TABLE IF EXISTS rutina_ejercicio;
+DROP TABLE IF EXISTS comida_alimento;
+DROP TABLE IF EXISTS comidas;
+DROP TABLE IF EXISTS registros_diarios;
+DROP TABLE IF EXISTS rutinas;
+DROP TABLE IF EXISTS ejercicios;
+DROP TABLE IF EXISTS alimentos;
+DROP TABLE IF EXISTS usuarios;
+
+--  1. USUARIOS 
+CREATE TABLE usuarios (
+  id                     INT NOT NULL AUTO_INCREMENT,
+  nombre                 VARCHAR(100) NOT NULL,
+  apellidos              VARCHAR(150) NOT NULL,
+  email                  VARCHAR(255) NOT NULL UNIQUE,
+  password_hash          VARCHAR(255) NOT NULL,
+  peso                   DECIMAL(5,2) NOT NULL,
+  altura                 INT NOT NULL,
+  genero                 ENUM('Hombre','Mujer') NOT NULL,
+  objetivo               ENUM('Recomposicion','Volumen','Definicion') NOT NULL,
+  nivel_actividad        ENUM('Sedentario','Ligero','Moderado','Intenso','Muy_intenso') NOT NULL,
+  gasto_energetico_total DECIMAL(7,2) DEFAULT NULL,
+  edad                   INT NOT NULL,
+  fecha_registro         DATETIME DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+INSERT INTO usuarios VALUES
+(1,'Carlos','García López','carlos@example.com','ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f',90.00,172,'Hombre','Definicion','Moderado',2480.50,19,'2026-03-10 11:12:21'),
+(2,'Laura','Martínez Ruiz','laura@example.com','c6ba91b90d922e159893f46c387e5dc1b3dc5c101a5a4522f03b987177a24a91',62.00,165,'Mujer','Recomposicion','Ligero',1890.75,22,'2026-03-10 11:12:21'),
+(3,'luis','luis','luis@gmail.com','8bb0cf6eb9b17d0f7d22b456f121257dc1254e1f01665370476383ea776df414',123.00,123,'Hombre','Recomposicion','Moderado',3012.81,12,'2026-03-19 09:07:12'),
+(4,'Paco','Paco','Paco@','8bb0cf6eb9b17d0f7d22b456f121257dc1254e1f01665370476383ea776df414',80.00,190,'Hombre','Volumen','Intenso',3247.31,22,'2026-03-19 11:27:26');
+
+--  2. ALIMENTOS 
+CREATE TABLE alimentos (
+  id                     INT NOT NULL AUTO_INCREMENT,
+  id_usuario             INT DEFAULT NULL,
+  nombre                 VARCHAR(150) NOT NULL,
+  kcal_por_100g          DECIMAL(7,2) NOT NULL,
+  proteinas_por_100g     DECIMAL(6,2) NOT NULL,
+  carbohidratos_por_100g DECIMAL(6,2) NOT NULL,
+  grasas_por_100g        DECIMAL(6,2) NOT NULL,
+  es_personalizado       TINYINT(1) DEFAULT 0,
+  PRIMARY KEY (id),
+  CONSTRAINT fk_alimento_usuario FOREIGN KEY (id_usuario) REFERENCES usuarios(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+INSERT INTO alimentos VALUES
+(1,NULL,'Pechuga de pollo',165.00,31.00,0.00,3.60,0),(2,NULL,'Arroz blanco cocido',130.00,2.70,28.00,0.30,0),(3,NULL,'Huevo entero',155.00,13.00,1.10,11.00,0),(4,NULL,'Avena',389.00,16.90,66.30,6.90,0),(5,NULL,'Atún en lata',116.00,25.50,0.00,1.00,0),(6,NULL,'Plátano',89.00,1.10,22.80,0.30,0),(7,NULL,'Aceite de oliva',884.00,0.00,0.00,100.00,0),(8,NULL,'Brócoli',34.00,2.80,6.60,0.40,0),(9,1,'Batido proteína chocolate',380.00,70.00,18.00,5.00,1),(10,3,'leche',120.00,12.00,12.00,12.00,1),(11,3,'12',12.00,123.00,123.00,123.00,1),(12,NULL,'Pechuga de pollo (cocida)',165.00,31.00,0.00,3.60,0),(13,NULL,'Muslo de pollo (cocido)',209.00,26.00,0.00,11.00,0),(14,NULL,'Ternera (solomillo, crudo)',143.00,21.50,0.00,6.00,0),(15,NULL,'Cerdo (lomo, crudo)',182.00,20.50,0.00,11.00,0),(16,NULL,'Cerdo (costilla, cruda)',263.00,17.00,0.00,21.50,0),(17,NULL,'Cordero (pierna, crudo)',206.00,18.00,0.00,14.50,0),(18,NULL,'Pavo (pechuga, cocida)',135.00,30.00,0.00,1.00,0),(19,NULL,'Jamón serrano',241.00,30.50,0.50,13.00,0),(20,NULL,'Jamón cocido (pavo)',95.00,14.50,1.00,3.50,0),(21,NULL,'Bacon (panceta ahumada)',458.00,12.50,0.50,45.00,0),(22,NULL,'Chorizo',455.00,21.50,2.00,40.00,0),(23,NULL,'Salchichón',420.00,22.00,1.00,37.00,0),(24,NULL,'Mortadela',280.00,14.00,2.50,24.00,0),(25,NULL,'Salchicha Frankfurt',280.00,11.00,3.00,25.00,0),(26,NULL,'Carne picada de ternera (cruda)',195.00,19.00,0.00,13.00,0),(27,NULL,'Salmón (crudo)',208.00,20.00,0.00,13.50,0),(28,NULL,'Atún en aceite (escurrido)',290.00,25.50,0.00,20.50,0),(29,NULL,'Atún al natural (escurrido)',103.00,23.50,0.00,0.80,0),(30,NULL,'Merluza (cruda)',86.00,17.50,0.00,2.00,0),(31,NULL,'Bacalao (salado, desalado)',85.00,20.00,0.00,0.50,0),(32,NULL,'Dorada (cruda)',100.00,19.00,0.00,2.50,0),(33,NULL,'Lubina (cruda)',97.00,18.50,0.00,2.50,0),(34,NULL,'Sardina (en aceite, escurrida)',210.00,21.00,0.00,14.00,0),(35,NULL,'Caballa (en aceite, escurrida)',237.00,20.00,0.00,17.00,0),(36,NULL,'Gamba (cocida)',99.00,21.00,0.00,1.50,0),(37,NULL,'Mejillón (cocido)',86.00,12.00,4.00,2.00,0),(38,NULL,'Calamar (crudo)',82.00,16.00,1.50,1.50,0),(39,NULL,'Pulpo (cocido)',164.00,29.50,4.50,2.50,0),(40,NULL,'Huevo entero (crudo)',147.00,12.50,0.70,10.00,0),(41,NULL,'Clara de huevo (cruda)',52.00,11.00,0.70,0.20,0),(42,NULL,'Yema de huevo (cruda)',352.00,16.00,1.00,31.50,0),(43,NULL,'Huevo duro',155.00,13.00,1.00,11.00,0),(44,NULL,'Leche entera',65.00,3.20,4.70,3.60,0),(45,NULL,'Leche semidesnatada',47.00,3.30,4.90,1.50,0),(46,NULL,'Leche desnatada',35.00,3.50,5.00,0.10,0),(47,NULL,'Yogur natural entero',63.00,4.00,4.50,3.30,0),(48,NULL,'Yogur natural desnatado',40.00,4.50,5.00,0.20,0),(49,NULL,'Yogur griego natural',133.00,5.50,4.00,10.00,0),(50,NULL,'Queso fresco Burgos',98.00,12.50,2.50,4.50,0),(51,NULL,'Queso manchego curado',392.00,31.50,0.50,30.00,0),(52,NULL,'Queso Emmental',397.00,27.50,1.50,31.00,0),(53,NULL,'Queso mozzarella',280.00,22.00,2.50,20.50,0),(54,NULL,'Queso parmesano',431.00,38.50,0.00,29.50,0),(55,NULL,'Requesón',98.00,11.00,4.00,4.00,0),(56,NULL,'Nata para cocinar (18% MG)',188.00,2.50,3.50,18.00,0),(57,NULL,'Mantequilla',749.00,0.70,0.60,83.00,0),(58,NULL,'Pan blanco',265.00,7.50,52.00,1.50,0),(59,NULL,'Pan integral',235.00,9.00,43.00,2.50,0),(60,NULL,'Pan de molde blanco',265.00,8.50,46.50,4.50,0),(61,NULL,'Arroz blanco (cocido)',130.00,2.50,28.00,0.30,0),(62,NULL,'Arroz integral (cocido)',123.00,2.50,25.50,0.90,0),(63,NULL,'Pasta (cocida)',158.00,5.50,31.50,0.90,0),(64,NULL,'Pasta integral (cocida)',149.00,6.00,28.50,1.20,0),(65,NULL,'Avena (copos, cruda)',368.00,13.50,58.50,7.00,0),(66,NULL,'Maíz (mazorca, cocido)',108.00,3.50,23.00,1.50,0),(67,NULL,'Maíz (granos, en lata)',86.00,3.00,18.50,1.00,0),(68,NULL,'Harina de trigo',348.00,9.50,73.00,1.00,0),(69,NULL,'Quinoa (cocida)',120.00,4.50,22.00,2.00,0),(70,NULL,'Copos de maíz (Corn Flakes)',377.00,7.00,84.00,0.90,0),(71,NULL,'Granola',471.00,8.50,63.50,20.00,0),(72,NULL,'Lentejas (cocidas)',116.00,9.00,20.00,0.40,0),(73,NULL,'Garbanzos (cocidos)',164.00,8.50,27.50,2.50,0),(74,NULL,'Alubias negras (cocidas)',132.00,8.50,24.00,0.50,0),(75,NULL,'Alubias blancas (cocidas)',139.00,9.50,25.00,0.50,0),(76,NULL,'Edamame (cocido)',121.00,11.00,8.50,5.00,0),(77,NULL,'Tofu firme',76.00,8.00,1.50,4.50,0),(78,NULL,'Hummus',177.00,5.00,14.50,11.00,0),(79,NULL,'Tomate (crudo)',18.00,0.90,3.50,0.20,0),(80,NULL,'Lechuga romana',17.00,1.50,2.00,0.30,0),(81,NULL,'Espinacas (crudas)',23.00,2.90,3.50,0.40,0),(82,NULL,'Brócoli (crudo)',34.00,2.80,6.50,0.40,0),(83,NULL,'Zanahoria (cruda)',41.00,0.90,9.50,0.20,0),(84,NULL,'Cebolla (cruda)',40.00,1.10,9.50,0.10,0),(85,NULL,'Ajo',149.00,6.40,32.00,0.50,0),(86,NULL,'Pimiento rojo (crudo)',31.00,1.00,7.00,0.30,0),(87,NULL,'Pimiento verde (crudo)',20.00,1.00,4.50,0.20,0),(88,NULL,'Pepino (crudo)',16.00,0.70,3.00,0.10,0),(89,NULL,'Calabacín (crudo)',17.00,1.20,3.00,0.20,0),(90,NULL,'Berenjena (cruda)',25.00,1.00,5.50,0.20,0),(91,NULL,'Coliflor (cruda)',25.00,1.90,4.50,0.30,0),(92,NULL,'Col lombarda (cruda)',29.00,1.40,6.00,0.20,0),(93,NULL,'Champiñón (crudo)',22.00,3.10,3.30,0.30,0),(94,NULL,'Maíz dulce (cocido)',108.00,3.50,23.00,1.50,0),(95,NULL,'Guisantes (cocidos)',81.00,5.50,13.50,0.40,0),(96,NULL,'Espárragos (cocidos)',20.00,2.20,3.50,0.20,0),(97,NULL,'Acelgas (cocidas)',19.00,1.80,3.20,0.20,0),(98,NULL,'Col de Bruselas (cocida)',36.00,2.50,6.50,0.50,0),(99,NULL,'Remolacha (cocida)',44.00,1.70,9.50,0.20,0),(100,NULL,'Patata (cocida sin piel)',77.00,2.00,17.00,0.10,0),(101,NULL,'Batata (cocida)',90.00,2.00,21.00,0.10,0),(102,NULL,'Aguacate',160.00,2.00,8.50,14.50,0),(103,NULL,'Manzana (con piel)',52.00,0.30,13.80,0.20,0),(104,NULL,'Plátano',89.00,1.10,22.80,0.30,0),(105,NULL,'Naranja',47.00,0.90,11.70,0.10,0),(106,NULL,'Fresa',33.00,0.70,7.70,0.30,0),(107,NULL,'Uva (verde)',67.00,0.60,17.20,0.20,0),(108,NULL,'Sandía',30.00,0.60,7.50,0.20,0),(109,NULL,'Melón',36.00,0.90,8.50,0.20,0),(110,NULL,'Mango',60.00,0.80,15.00,0.40,0),(111,NULL,'Pera',57.00,0.40,15.20,0.10,0),(112,NULL,'Melocotón',39.00,0.90,10.00,0.30,0),(113,NULL,'Kiwi',61.00,1.10,14.70,0.50,0),(114,NULL,'Piña',50.00,0.50,13.10,0.10,0),(115,NULL,'Arándanos',57.00,0.70,14.50,0.30,0),(116,NULL,'Frambuesas',52.00,1.20,11.90,0.70,0),(117,NULL,'Cerezas',63.00,1.10,16.00,0.20,0),(118,NULL,'Limón (zumo)',22.00,0.40,6.90,0.20,0),(119,NULL,'Pomelo',42.00,0.80,10.60,0.10,0),(120,NULL,'Almendras (crudas)',579.00,21.00,21.50,49.50,0),(121,NULL,'Nueces',654.00,15.50,13.50,65.00,0),(122,NULL,'Cacahuetes (tostados)',587.00,25.50,21.50,49.50,0),(123,NULL,'Anacardos (tostados)',581.00,15.50,32.50,46.50,0),(124,NULL,'Pistachos (tostados)',572.00,21.00,28.00,45.50,0),(125,NULL,'Avellanas',628.00,15.00,16.50,60.50,0),(126,NULL,'Semillas de chía',486.00,17.00,42.00,30.50,0),(127,NULL,'Semillas de lino',534.00,18.50,28.50,42.00,0),(128,NULL,'Semillas de calabaza',559.00,30.00,17.50,45.50,0),(129,NULL,'Aceite de oliva virgen extra',884.00,0.00,0.00,100.00,0),(130,NULL,'Aceite de girasol',884.00,0.00,0.00,100.00,0),(131,NULL,'Aceite de coco',862.00,0.00,0.00,100.00,0),(132,NULL,'Ketchup',97.00,1.50,22.50,0.50,0),(133,NULL,'Mostaza',66.00,4.50,5.50,3.50,0),(134,NULL,'Mayonesa',680.00,1.50,3.00,75.00,0),(135,NULL,'Salsa de soja',60.00,8.00,5.50,0.10,0),(136,NULL,'Vinagre de manzana',21.00,0.00,1.00,0.00,0),(137,NULL,'Tomate frito (salsa)',74.00,1.50,9.00,3.50,0),(138,NULL,'Leche de avena',46.00,1.00,7.50,1.50,0),(139,NULL,'Leche de almendras (sin azúcar)',17.00,0.60,0.30,1.50,0),(140,NULL,'Leche de soja (sin azúcar)',33.00,3.00,1.50,1.80,0),(141,NULL,'Zumo de naranja (natural)',45.00,0.70,10.40,0.20,0),(142,NULL,'Zumo de manzana (sin azúcar)',46.00,0.10,11.30,0.10,0),(143,NULL,'Café (solo, sin azúcar)',2.00,0.30,0.00,0.00,0),(144,NULL,'Té verde (sin azúcar)',1.00,0.00,0.20,0.00,0),(145,NULL,'Chocolate negro 70%',598.00,8.00,46.00,43.00,0),(146,NULL,'Chocolate con leche',535.00,7.50,57.50,30.00,0),(147,NULL,'Galletas María',432.00,7.00,74.50,12.50,0),(148,NULL,'Patatas fritas (bolsa)',536.00,7.00,53.00,33.00,0),(149,NULL,'Palomitas (hechas en casa)',375.00,9.50,74.50,4.50,0),(150,NULL,'Barritas de cereales',384.00,6.50,68.50,9.50,0),(151,NULL,'Miel',304.00,0.30,82.00,0.00,0),(152,NULL,'Mermelada de fresa',250.00,0.50,62.50,0.10,0),(153,NULL,'Crema de cacahuete',588.00,22.50,22.50,50.00,0),(154,NULL,'Crema de cacao (Nutella)',539.00,6.00,57.50,31.00,0),(155,NULL,'Proteína de suero (Whey)',375.00,75.00,10.00,5.00,0),(156,NULL,'Proteína vegana (guisante)',370.00,80.00,5.50,3.50,0),(157,NULL,'Caseína',360.00,80.00,6.50,2.50,0),(158,NULL,'Pizza margarita (masa fina)',250.00,9.50,31.50,9.00,0),(159,NULL,'Tortilla española',163.00,10.00,7.50,10.50,0),(160,NULL,'Caldo de pollo (desgrasado)',8.00,1.20,0.50,0.20,0),(161,NULL,'Paella de pollo',162.00,9.00,22.50,4.00,0);
+
+-- 3. EJERCICIOS 
+CREATE TABLE ejercicios (
+  id               INT NOT NULL AUTO_INCREMENT,
+  id_usuario       INT DEFAULT NULL,
+  nombre_es        VARCHAR(150) NOT NULL,
+  nombre_en        VARCHAR(150) NOT NULL,
+  nombre_fr        VARCHAR(150) NOT NULL,
+  es_cardio        TINYINT(1) DEFAULT 0,
+  grupo_muscular   ENUM('Pecho','Espalda','Pierna','Biceps','Triceps','Hombro','Abdomen') DEFAULT NULL,
+  es_personalizado TINYINT(1) DEFAULT 0,
+  PRIMARY KEY (id),
+  CONSTRAINT fk_ejercicio_usuario FOREIGN KEY (id_usuario) REFERENCES usuarios(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+INSERT INTO ejercicios VALUES
+(1,NULL,'Press banca','Bench Press','Développé couché',0,'Pecho',0),
+(2,NULL,'Dominadas','Pull-ups','Tractions',0,'Espalda',0),
+(3,NULL,'Sentadilla','Squat','Squat',0,'Pierna',0),
+(4,NULL,'Curl de bíceps','Bicep Curl','Curl biceps',0,'Biceps',0),
+(5,NULL,'Press francés','French Press','Extension triceps couché',0,'Triceps',0),
+(6,NULL,'Press militar','Military Press','Développé militaire',0,'Hombro',0),
+(7,NULL,'Cinta de correr','Treadmill','Tapis de course',1,NULL,0),
+(8,NULL,'Elíptica','Elliptical','Elliptique',1,NULL,0),
+(9,1,'Curl martillo cable','Cable Hammer Curl','Curl marteau câble',0,'Biceps',1),
+(10,4,'Press francés','French Press','Extension triceps couché',0,'Triceps',1),
+(11,4,'Curl araña','Spider Curl','Curl araignée',0,'Biceps',1),
+(12,NULL,'Press de banca plano','Flat Bench Press','Développé couché plat',0,'Pecho',0),
+(13,NULL,'Press de banca inclinado','Incline Bench Press','Développé couché incliné',0,'Pecho',0),
+(14,NULL,'Press de banca declinado','Decline Bench Press','Développé couché décliné',0,'Pecho',0),
+(15,NULL,'Press con mancuernas plano','Flat Dumbbell Press','Développé haltères plat',0,'Pecho',0),
+(16,NULL,'Press con mancuernas inclinado','Incline Dumbbell Press','Développé haltères incliné',0,'Pecho',0),
+(17,NULL,'Aperturas con mancuernas','Dumbbell Flyes','Écarté haltères',0,'Pecho',0),
+(18,NULL,'Aperturas en polea cruzada','Cable Crossover Flyes','Écarté poulie croisée',0,'Pecho',0),
+(19,NULL,'Fondos en paralelas','Dips','Dips',0,'Pecho',0),
+(20,NULL,'Flexiones','Push-ups','Pompes',0,'Pecho',0),
+(21,NULL,'Pullover con mancuerna','Dumbbell Pullover','Pullover haltère',0,'Pecho',0),
+(23,NULL,'Jalón al pecho','Lat Pulldown','Tirage poitrine',0,'Espalda',0),
+(24,NULL,'Jalón tras nuca','Behind-the-neck Pulldown','Tirage nuque',0,'Espalda',0),
+(25,NULL,'Remo con barra','Barbell Row','Rowing barre',0,'Espalda',0),
+(26,NULL,'Remo con mancuerna','Dumbbell Row','Rowing haltère',0,'Espalda',0),
+(27,NULL,'Remo en polea baja','Low Cable Row','Rowing poulie basse',0,'Espalda',0),
+(28,NULL,'Peso muerto convencional','Conventional Deadlift','Soulevé de terre conventionnel',0,'Espalda',0),
+(29,NULL,'Peso muerto rumano','Romanian Deadlift','Soulevé de terre roumain',0,'Espalda',0),
+(30,NULL,'Hiperextensiones','Hyperextensions','Hyperextensions',0,'Espalda',0),
+(31,NULL,'Pull-over en polea','Cable Pullover','Pullover poulie',0,'Espalda',0),
+(32,NULL,'Sentadilla con barra','Barbell Squat','Squat barre',0,'Pierna',0),
+(33,NULL,'Sentadilla goblet','Goblet Squat','Squat goblet',0,'Pierna',0),
+(34,NULL,'Prensa de piernas','Leg Press','Presse à cuisses',0,'Pierna',0),
+(35,NULL,'Extensión de cuádriceps','Leg Extension','Extension quadriceps',0,'Pierna',0),
+(36,NULL,'Curl femoral tumbado','Lying Leg Curl','Curl ischio-jambiers couché',0,'Pierna',0),
+(37,NULL,'Curl femoral de pie','Standing Leg Curl','Curl ischio-jambiers debout',0,'Pierna',0),
+(38,NULL,'Peso muerto sumo','Sumo Deadlift','Soulevé de terre sumo',0,'Pierna',0),
+(39,NULL,'Zancadas con mancuernas','Dumbbell Lunges','Fentes haltères',0,'Pierna',0),
+(40,NULL,'Zancadas con barra','Barbell Lunges','Fentes barre',0,'Pierna',0),
+(41,NULL,'Hip thrust con barra','Barbell Hip Thrust','Hip thrust barre',0,'Pierna',0),
+(42,NULL,'Elevación de gemelos de pie','Standing Calf Raise','Mollet debout',0,'Pierna',0),
+(43,NULL,'Elevación de gemelos sentado','Seated Calf Raise','Mollet assis',0,'Pierna',0),
+(44,NULL,'Sentadilla búlgara','Bulgarian Split Squat','Squat bulgare',0,'Pierna',0),
+(45,NULL,'Patada de glúteo en polea','Cable Glute Kickback','Coup de pied fessier poulie',0,'Pierna',0),
+(46,NULL,'Press militar con barra','Barbell Military Press','Développé militaire barre',0,'Hombro',0),
+(47,NULL,'Press militar con mancuernas','Dumbbell Military Press','Développé militaire haltères',0,'Hombro',0),
+(48,NULL,'Elevaciones laterales','Lateral Raises','Élévations latérales',0,'Hombro',0),
+(49,NULL,'Elevaciones frontales','Front Raises','Élévations frontales',0,'Hombro',0),
+(50,NULL,'Pájaro con mancuernas','Dumbbell Rear Delt Fly','Oiseau haltères',0,'Hombro',0),
+(51,NULL,'Face pull en polea','Face Pull','Face pull',0,'Hombro',0),
+(52,NULL,'Arnold press','Arnold Press','Arnold press',0,'Hombro',0),
+(53,NULL,'Encogimientos de hombros','Shoulder Shrugs','Haussements d\'épaules',0,'Hombro',0),
+(54,NULL,'Curl de bíceps con barra','Barbell Bicep Curl','Curl biceps barre',0,'Biceps',0),
+(55,NULL,'Curl de bíceps con mancuernas','Dumbbell Bicep Curl','Curl biceps haltères',0,'Biceps',0),
+(56,NULL,'Curl martillo','Hammer Curl','Curl marteau',0,'Biceps',0),
+(57,NULL,'Curl en polea baja','Low Cable Curl','Curl poulie basse',0,'Biceps',0),
+(58,NULL,'Curl concentrado','Concentration Curl','Curl concentré',0,'Biceps',0),
+(59,NULL,'Curl en banco Scott','Scott Bench Curl','Curl banc Scott',0,'Biceps',0),
+(60,NULL,'Curl inverso con barra','Reverse Barbell Curl','Curl inversé barre',0,'Biceps',0),
+(61,NULL,'Press francés con barra','Barbell French Press','Extension triceps barre couché',0,'Triceps',0),
+(62,NULL,'Press francés con mancuerna','Dumbbell French Press','Extension triceps haltère couché',0,'Triceps',0),
+(63,NULL,'Extensión de tríceps en polea','Tricep Pushdown','Extension triceps poulie',0,'Triceps',0),
+(64,NULL,'Extensión de tríceps sobre cabeza','Overhead Tricep Extension','Extension triceps au-dessus tête',0,'Triceps',0),
+(65,NULL,'Fondos en banco','Bench Dips','Dips banc',0,'Triceps',0),
+(66,NULL,'Press cerrado con barra','Close Grip Bench Press','Développé prise serrée',0,'Triceps',0),
+(67,NULL,'Kickback de tríceps','Tricep Kickback','Kickback triceps',0,'Triceps',0),
+(68,NULL,'Crunch abdominal','Abdominal Crunch','Crunch abdominal',0,'Abdomen',0),
+(69,NULL,'Crunch en polea','Cable Crunch','Crunch poulie',0,'Abdomen',0),
+(70,NULL,'Plancha frontal','Front Plank','Planche frontale',0,'Abdomen',0),
+(71,NULL,'Plancha lateral','Side Plank','Planche latérale',0,'Abdomen',0),
+(72,NULL,'Elevación de piernas tumbado','Lying Leg Raise','Élévation des jambes couché',0,'Abdomen',0),
+(73,NULL,'Rueda abdominal','Ab Wheel Rollout','Roue abdominale',0,'Abdomen',0),
+(74,NULL,'Russian twist','Russian Twist','Russian twist',0,'Abdomen',0),
+(75,NULL,'Tijeras abdominales','Scissor Kicks','Ciseaux abdominaux',0,'Abdomen',0),
+(76,NULL,'Mountain climbers','Mountain Climbers','Grimpeur',0,'Abdomen',0),
+(77,NULL,'Hollow body','Hollow Body Hold','Gainage hollow body',0,'Abdomen',0),
+(78,NULL,'Carrera continua','Steady State Running','Course continue',1,NULL,0),
+(79,NULL,'Carrera en cinta','Treadmill Running','Course sur tapis',1,NULL,0),
+(80,NULL,'Bicicleta estática','Stationary Bike','Vélo stationnaire',1,NULL,0),
+(81,NULL,'Bicicleta al aire libre','Outdoor Cycling','Vélo en plein air',1,NULL,0),
+(83,NULL,'Remo ergómetro','Rowing Machine','Rameur ergomètre',1,NULL,0),
+(84,NULL,'Salto a la comba','Jump Rope','Corde à sauter',1,NULL,0),
+(85,NULL,'Natación','Swimming','Natation',1,NULL,0),
+(86,NULL,'HIIT (intervalos)','HIIT (intervals)','HIIT (intervalles)',1,NULL,0),
+(87,NULL,'Burpees','Burpees','Burpees',1,NULL,0),
+(88,NULL,'Step aeróbico','Step Aerobics','Step aérobique',1,NULL,0),
+(89,NULL,'Senderismo','Hiking','Randonnée',1,NULL,0);
+
+-- 4. REGISTROS DIARIOS 
+CREATE TABLE registros_diarios (
+  id               INT NOT NULL AUTO_INCREMENT,
+  id_usuario       INT NOT NULL,
+  fecha            DATE NOT NULL,
+  kcal_totales_dia DECIMAL(7,2) DEFAULT NULL,
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_usuario_fecha (id_usuario, fecha),
+  CONSTRAINT fk_registro_usuario FOREIGN KEY (id_usuario) REFERENCES usuarios(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+INSERT INTO registros_diarios VALUES
+(1,1,'2026-03-10',0.00),(2,3,'2026-03-19',884.00),
+(3,4,'2026-03-19',0.00),(4,4,'2026-03-23',3473.50);
+
+-- 5. RUTINAS 
+CREATE TABLE rutinas (
+  id         INT NOT NULL AUTO_INCREMENT,
+  id_usuario INT NOT NULL,
+  nombre     VARCHAR(150) NOT NULL,
+  fecha      DATE NOT NULL,
+  notas      TEXT DEFAULT NULL,
+  PRIMARY KEY (id),
+  CONSTRAINT fk_rutina_usuario FOREIGN KEY (id_usuario) REFERENCES usuarios(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+INSERT INTO rutinas VALUES
+(1,1,'Pecho y Bíceps','2026-03-10','Sesión de empuje con cardio final'),
+(3,3,'PPL','2026-03-19',NULL),
+(5,4,'Pecho y Triceps','2026-03-19',NULL),
+(6,4,'ejemplo1','2026-03-23','es de ejemplo tete');
+
+-- 6. COMIDAS
+CREATE TABLE comidas (
+  id                 INT NOT NULL AUTO_INCREMENT,
+  id_registro_diario INT NOT NULL,
+  tipo_comida        ENUM('Desayuno','Almuerzo','Merienda','Cena','Extra') NOT NULL,
+  hora               TIME DEFAULT NULL,
+  PRIMARY KEY (id),
+  CONSTRAINT fk_comida_registro FOREIGN KEY (id_registro_diario) REFERENCES registros_diarios(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+INSERT INTO comidas VALUES
+(1,1,'Desayuno','08:00:00'),(2,1,'Almuerzo','13:30:00'),(3,1,'Cena','21:00:00'),
+(4,2,'Cena',NULL),(5,2,'Almuerzo',NULL),(6,4,'Desayuno',NULL),
+(7,4,'Extra',NULL),(8,4,'Cena',NULL),(9,4,'Merienda',NULL);
+
+-- 7. COMIDA_ALIMENTO
+CREATE TABLE comida_alimento (
+  id              INT NOT NULL AUTO_INCREMENT,
+  id_comida       INT NOT NULL,
+  id_alimento     INT NOT NULL,
+  cantidad_gramos DECIMAL(7,2) NOT NULL,
+  kcal_calculadas DECIMAL(7,2) DEFAULT NULL,
+  PRIMARY KEY (id),
+  CONSTRAINT fk_ca_comida   FOREIGN KEY (id_comida)   REFERENCES comidas(id)   ON DELETE CASCADE,
+  CONSTRAINT fk_ca_alimento FOREIGN KEY (id_alimento) REFERENCES alimentos(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+INSERT INTO comida_alimento VALUES
+(1,1,4,80.00,311.20),(2,1,6,120.00,106.80),(3,2,1,200.00,330.00),(4,2,2,150.00,195.00),
+(5,2,8,100.00,34.00),(6,3,5,150.00,174.00),(7,3,3,120.00,186.00),(9,5,7,100.00,884.00),
+(10,6,7,100.00,884.00),(11,7,2,200.00,260.00),(12,8,1,300.00,495.00),
+(13,6,25,120.00,336.00),(14,6,72,600.00,696.00),(15,9,146,150.00,802.50);
+
+-- 8. RUTINA_EJERCICIO
+CREATE TABLE rutina_ejercicio (
+  id               INT NOT NULL AUTO_INCREMENT,
+  id_rutina        INT NOT NULL,
+  id_ejercicio     INT NOT NULL,
+  series           INT DEFAULT NULL,
+  repeticiones     INT DEFAULT NULL,
+  peso_kg          DECIMAL(6,2) DEFAULT NULL,
+  duracion_minutos INT DEFAULT NULL,
+  series_detalle   TEXT DEFAULT NULL,
+  PRIMARY KEY (id),
+  CONSTRAINT fk_re_rutina    FOREIGN KEY (id_rutina)    REFERENCES rutinas(id)    ON DELETE CASCADE,
+  CONSTRAINT fk_re_ejercicio FOREIGN KEY (id_ejercicio) REFERENCES ejercicios(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+INSERT INTO rutina_ejercicio VALUES
+(1,1,1,4,10,80.00,NULL,NULL),(2,1,4,3,12,20.00,NULL,NULL),
+(3,1,9,3,10,15.00,NULL,NULL),(4,1,7,NULL,NULL,NULL,15,NULL),
+(5,3,1,4,12,300.00,NULL,NULL),(6,3,2,3,12,NULL,NULL,NULL),
+(7,5,16,3,15,30.00,NULL,NULL);
+
+-- 9. SESIONES_ENTRENAMIENTO
+CREATE TABLE sesiones_entrenamiento (
+  id         INT NOT NULL AUTO_INCREMENT,
+  id_rutina  INT NOT NULL,
+  id_usuario INT NOT NULL,
+  fecha      DATE NOT NULL,
+  notas      TEXT DEFAULT NULL,
+  PRIMARY KEY (id),
+  KEY idx_sesion_usuario (id_usuario),
+  KEY idx_sesion_fecha   (fecha),
+  CONSTRAINT fk_sesion_rutina  FOREIGN KEY (id_rutina)  REFERENCES rutinas(id)  ON DELETE CASCADE,
+  CONSTRAINT fk_sesion_usuario FOREIGN KEY (id_usuario) REFERENCES usuarios(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 10. SESION_EJERCICIO
+CREATE TABLE sesion_ejercicio (
+  id                INT NOT NULL AUTO_INCREMENT,
+  id_sesion         INT NOT NULL,
+  id_ejercicio      INT NOT NULL,
+  series_realizadas TEXT DEFAULT NULL,
+  PRIMARY KEY (id),
+  KEY idx_se_sesion (id_sesion),
+  CONSTRAINT fk_se_sesion    FOREIGN KEY (id_sesion)    REFERENCES sesiones_entrenamiento(id) ON DELETE CASCADE,
+  CONSTRAINT fk_se_ejercicio FOREIGN KEY (id_ejercicio) REFERENCES ejercicios(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+SET FOREIGN_KEY_CHECKS = 1;
